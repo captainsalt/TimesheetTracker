@@ -19,10 +19,7 @@ public static class TimesheetFiller
                 if (GetIncompleteProject(timesheet) is not { } project)
                     return timesheet;
 
-                if (timesheet.ProjectTotalHours(project) == project.MaxHours)
-                    return timesheet;
-
-                timesheet.AddHoursToProject(project, day.day, 1);
+                project.AddWorkHours(day.day, 1);
             }
         }
 
@@ -31,21 +28,16 @@ public static class TimesheetFiller
 
     private static IEnumerable<(int day, int hours)> IncompleteDays(Timesheet timesheet)
     {
-        return Enumerable
-            .Range(1, timesheet.Month.DaysInMonth)
-            .Select((day) => (day, hours: timesheet.SheetDailyHours(day)))
-            .Where(record => record.hours < MAX_DAILY_HOURS);
+        return Enumerable.Range(1, timesheet.DaysInMonth)
+            .Select((day, hours) => (day, hours: timesheet.SheetDailyHours(day)))
+            .Where(day => day.hours < MAX_DAILY_HOURS);
     }
 
     private static Project? GetIncompleteProject(Timesheet timesheet)
     {
-        var project = timesheet
-            .Projects
-            .Keys
-            .Where(p => timesheet.ProjectTotalHours(p) < p.MaxHours)
-            .OrderBy(timesheet.ProjectTotalHours)
+        return timesheet.Projects
+            .Where(p => p.WorkHoursLeft > 0)
+            .OrderBy(p => p.WorkHoursLeft)
             .FirstOrDefault();
-
-        return project;
     }
 }

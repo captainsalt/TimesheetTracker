@@ -1,52 +1,43 @@
 ﻿namespace TimesheetTracker.Core;
 
-public readonly record struct Month(DateTime Time)
+public class Project
 {
-    public int DaysInMonth { get; init; } = DateTime.DaysInMonth(Time.Year, Time.Month);
-}
+    private readonly int[] _workHours;
 
-public readonly record struct Project(string Name, int MaxHours);
+    internal Project(string name, int maxHours, int daysInMonth)
+    {
+        Name = name;
+        MaxHours = maxHours;
+        _workHours = new int[daysInMonth];
+    }
 
-public class Timesheet(Month month, List<int> offDays)
+    public string Name { get; }
+    public int MaxHours { get; }
+    public int TotalWorkedHours => _workHours.Sum();
+    public int WorkHoursLeft =>  MaxHours - TotalWorkedHours;
+
+    public int GetWorkedHours(int day) => _workHours[day - 1];
+
+    public int AddWorkHours(int day, int hours) => _workHours[day - 1] += hours;
+};
+
+public class Timesheet(int year, int month)
 {
-    public Month Month { get; } = month;
-    public List<int> OffDays { get; } = offDays;
-    public Dictionary<Project, int[]> Projects { get; } = [];
+    public int DaysInMonth { get; } = DateTime.DaysInMonth(year, month);
 
-    public void AddProjects(params Project[] projects)
+    public List<Project> Projects { get; } = [];
+
+    public int TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
+
+    public Project CreateProject(string name, int maxHours)
     {
-        foreach (var project in projects)
-            Projects.TryAdd(project, new int[Month.DaysInMonth]);
+        if (Projects.Any(p => p.Name == name))
+            throw new ArgumentException("Project already exists.");
+
+        var project = new Project(name, maxHours, DaysInMonth);
+        Projects.Add(project);
+        return project;
     }
 
-    public int SheetTotalHours() =>
-        Projects.Values.Sum(hours => hours.Sum());
-
-    public int SheetDailyHours(int day) =>
-        Projects.Values.Sum(hours => hours[day - 1]);
-
-    public int ProjectTotalHours(Project project) =>
-        Projects.TryGetValue(project, out var hours) ? hours.Sum() : 0;
-
-    public int ProjectDailyHours(Project project, int day)
-    {
-        int[] projectHours = FetchProjectHours(project, day);
-        return projectHours[day - 1];
-    }
-
-    public void AddHoursToProject(Project project, int day, int hours)
-    {
-        int[] projectHours = FetchProjectHours(project, day);
-        projectHours[day - 1] += hours;
-    }
-
-    private int[] FetchProjectHours(Project project, int day)
-    {
-        if (!Projects.TryGetValue(project, out var dailyHours))
-            throw new ArgumentException("Project not found.");
-        if (day < 1 || day > Month.DaysInMonth)
-            throw new ArgumentOutOfRangeException(nameof(day));
-
-        return dailyHours;
-    }
+    public int SheetDailyHours(int day) => Projects.Sum(p => p.GetWorkedHours(day));
 }
