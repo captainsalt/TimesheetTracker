@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TimesheetTracker.Core/TimesheetTracker.Core.csproj" Id="38e4ab80-56b1-4a57-b4bf-72a42bd48d87" />
+  <Project Path="TimesheetTracker.Tests/TimesheetTracker.Tests.csproj" Id="854dbd60-a722-4132-9939-32f6df32281f" />
+</Solution>
