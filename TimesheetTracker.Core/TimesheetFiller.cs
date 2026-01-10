@@ -16,7 +16,7 @@ public static class TimesheetFiller
         {
             foreach (var day in IncompleteDays(timesheet))
             {
-                if (RandomIncompleteProject(timesheet) is not { } project)
+                if (GetIncompleteProject(timesheet) is not { } project)
                     return timesheet;
 
                 if (timesheet.ProjectTotalHours(project) == project.MaxHours)
@@ -37,12 +37,13 @@ public static class TimesheetFiller
             .Where(record => record.hours < MAX_DAILY_HOURS);
     }
 
-    private static Project? RandomIncompleteProject(Timesheet timesheet)
+    private static Project? GetIncompleteProject(Timesheet timesheet)
     {
         var project = timesheet
             .Projects
             .Keys
             .Where(p => timesheet.ProjectTotalHours(p) < p.MaxHours)
+            .OrderBy(timesheet.ProjectTotalHours)
             .FirstOrDefault();
 
         return project;
