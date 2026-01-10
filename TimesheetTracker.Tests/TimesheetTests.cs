@@ -1,3 +1,4 @@
+using Shouldly;
 using TimesheetTracker.Core;
 
 namespace TimesheetTracker.Tests;
@@ -7,17 +8,18 @@ public class TimesheetTests
     private static Month _testMonth = new(new DateTime(1998, 11, 7));
 
     [Fact]
-    public void GetDailyProjectHours_ShouldCalculateDailyHours()
+    public void AddHoursToProject_ShouldAddHoursToProject()
     {
-        var project1 = new Project(_testMonth, "Project 1", maxHours: 0);
-        var project2 = new Project(_testMonth, "Project 2", maxHours: 0);
+        //Arrange 
+        var timesheet = new TimeSheet(_testMonth, offDays: []);
+        var project = new Project("Project A", 10);
+        timesheet.AddProjects(project);
 
-        project1.AddDailyHours(day: 1, hours: 2); project1.AddDailyHours(day: 2, hours: 4);
-        project2.AddDailyHours(day: 1, hours: 2); project2.AddDailyHours(day: 2, hours: 4);
+        //Act
+        timesheet.AddHoursToProject(project, day: 1, hours: 10);
+        timesheet.AddHoursToProject(project, day: 2, hours: 10);
 
-        var manager = new TimeSheet([project1, project2], _testMonth);
-
-        Assert.Equal(4, manager.GetDailyProjectHours(1));
-        Assert.Equal(8, manager.GetDailyProjectHours(2));
+        //Assert
+        timesheet.ProjectTotalHours(project).ShouldBe(20);
     }
 }
