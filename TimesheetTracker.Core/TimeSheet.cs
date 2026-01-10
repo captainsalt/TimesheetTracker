@@ -14,7 +14,7 @@ public class Project
     public string Name { get; }
     public int MaxHours { get; }
     public int TotalWorkedHours => _workHours.Sum();
-    public int WorkHoursLeft =>  MaxHours - TotalWorkedHours;
+    public int WorkHoursLeft => MaxHours - TotalWorkedHours;
 
     public int GetWorkedHours(int day) => _workHours[day - 1];
 

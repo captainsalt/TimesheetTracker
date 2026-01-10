@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TimesheetTracker.Core;
+﻿namespace TimesheetTracker.Core;
 
 public static class TimesheetFiller
 {

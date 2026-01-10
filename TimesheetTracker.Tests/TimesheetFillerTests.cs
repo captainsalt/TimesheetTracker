@@ -1,14 +1,11 @@
 ﻿using Shouldly;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TimesheetTracker.Core;
 
 namespace TimesheetTracker.Tests;
 
 public class TimesheetFillerTests
 {
-    private static int MaxMonthlyHours(Timesheet timesheet) => 
+    private static int MaxMonthlyHours(Timesheet timesheet) =>
         timesheet.DaysInMonth * TimesheetFiller.MAX_DAILY_HOURS;
 
     [Fact]
