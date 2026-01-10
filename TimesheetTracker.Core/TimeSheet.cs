@@ -7,26 +7,26 @@ public readonly record struct Month(DateTime Time)
 
 public readonly record struct Project(string Name, int MaxHours);
 
-public class TimeSheet(Month month, List<int> offDays)
+public class Timesheet(Month month, List<int> offDays)
 {
     public Month Month { get; } = month;
     public List<int> OffDays { get; } = offDays;
-    public Dictionary<Project, int[]> ProjectHours { get; } = [];
+    public Dictionary<Project, int[]> Projects { get; } = [];
 
     public void AddProjects(params Project[] projects)
     {
         foreach (var project in projects)
-            ProjectHours.TryAdd(project, new int[Month.DaysInMonth]);
+            Projects.TryAdd(project, new int[Month.DaysInMonth]);
     }
 
     public int SheetTotalHours() =>
-        ProjectHours.Values.Sum(hours => hours.Sum());
+        Projects.Values.Sum(hours => hours.Sum());
 
     public int SheetDailyHours(int day) =>
-        ProjectHours.Values.Sum(hours => hours[day - 1]);
+        Projects.Values.Sum(hours => hours[day - 1]);
 
     public int ProjectTotalHours(Project project) =>
-        ProjectHours.TryGetValue(project, out var hours) ? hours.Sum() : 0;
+        Projects.TryGetValue(project, out var hours) ? hours.Sum() : 0;
 
     public int ProjectDailyHours(Project project, int day)
     {
@@ -42,7 +42,7 @@ public class TimeSheet(Month month, List<int> offDays)
 
     private int[] FetchProjectHours(Project project, int day)
     {
-        if (!ProjectHours.TryGetValue(project, out var dailyHours))
+        if (!Projects.TryGetValue(project, out var dailyHours))
             throw new ArgumentException("Project not found.");
         if (day < 1 || day > Month.DaysInMonth)
             throw new ArgumentOutOfRangeException(nameof(day));

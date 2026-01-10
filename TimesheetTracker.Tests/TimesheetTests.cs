@@ -11,7 +11,7 @@ public class TimesheetTests
     public void AddHoursToProject_ShouldAddHoursToProject()
     {
         //Arrange 
-        var timesheet = new TimeSheet(_testMonth, offDays: []);
+        var timesheet = new Timesheet(_testMonth, offDays: []);
         var project = new Project("Project A", 10);
         timesheet.AddProjects(project);
 
