@@ -22,7 +22,7 @@ public class Project
     public int GetWorkedHours(int day) => _workHours[day - 1];
 
     public int AddWorkHours(int day, int hours) => _workHours[day - 1] += hours;
-};
+}
 
 public class Timesheet(int year, int month)
 {

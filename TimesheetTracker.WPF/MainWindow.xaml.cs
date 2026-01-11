@@ -21,7 +21,7 @@ namespace TimesheetTracker.WPF;
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
     public ObservableCollection<ProjectViewModel> ProjectViewModels { get; } = [];
-    public Timesheet Sheet { get; } = new(1997, 7);
+    public Timesheet Sheet { get; } = new(DateTime.Now.Year, DateTime.Now.Month);
     public int GrandTotal => Sheet.TotalWorkedHours;
 
     public MainWindow()
