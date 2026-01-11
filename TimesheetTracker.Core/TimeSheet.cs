@@ -8,11 +8,14 @@ public class Project
     {
         Name = name;
         MaxHours = maxHours;
+        DaysInMonth = daysInMonth;
         _workHours = new int[daysInMonth];
     }
 
     public string Name { get; }
     public int MaxHours { get; }
+    public int DaysInMonth { get; }
+
     public int TotalWorkedHours => _workHours.Sum();
     public int WorkHoursLeft => MaxHours - TotalWorkedHours;
 

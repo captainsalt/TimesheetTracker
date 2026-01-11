@@ -91,7 +91,7 @@ public partial class ProjectViewModel : ObservableObject
     public ProjectViewModel(Project project)
     {
         Project = project;
-        Days = Enumerable.Range(1, 31) // Ensure DaysInMonth is accessible
+        Days = Enumerable.Range(1, project.DaysInMonth) // Ensure DaysInMonth is accessible
                          .Select(d => new DayViewModel(project, d)).ToList();
 
         foreach (var day in Days)
