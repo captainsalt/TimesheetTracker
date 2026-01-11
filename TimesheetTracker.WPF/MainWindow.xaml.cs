@@ -65,31 +65,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
 
-public partial class DayViewModel : ObservableObject
+public partial class DayViewModel(Project project, int day) : ObservableObject
 {
-    private readonly Project _project;
-    private readonly int _day;
-
     public event EventHandler? HoursChanged;
 
-    public DayViewModel(Project project, int day)
-    {
-        _project = project;
-        _day = day;
-        _hours = project.GetWorkedHours(day);
-    }
-
     [ObservableProperty]
-    private int _hours;
+    private int _hours = project.GetWorkedHours(day);
 
     partial void OnHoursChanged(int value)
     {
-        int current = _project.GetWorkedHours(_day);
-        _project.AddWorkHours(_day, value - current);
+        int current = project.GetWorkedHours(day);
+        project.AddWorkHours(day, value - current);
         HoursChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void RefreshFromModel() => Hours = _project.GetWorkedHours(_day);
+    public void RefreshFromModel() => Hours = project.GetWorkedHours(day);
 }
 
 public partial class ProjectViewModel : ObservableObject
