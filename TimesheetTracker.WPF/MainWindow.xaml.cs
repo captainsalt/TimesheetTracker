@@ -84,13 +84,13 @@ public partial class DayViewModel(Project project, int day) : ObservableObject
 
 public partial class ProjectViewModel : ObservableObject
 {
-    public Project Model { get; }
+    public Project Project { get; }
     public List<DayViewModel> Days { get; }
     public event EventHandler? TotalsChanged;
 
     public ProjectViewModel(Project project)
     {
-        Model = project;
+        Project = project;
         Days = Enumerable.Range(1, 31) // Ensure DaysInMonth is accessible
                          .Select(d => new DayViewModel(project, d)).ToList();
 
@@ -100,8 +100,8 @@ public partial class ProjectViewModel : ObservableObject
         }
     }
 
-    public int TotalHours => Model.TotalWorkedHours;
-    public int HoursLeft => Model.WorkHoursLeft;
+    public int TotalHours => Project.TotalWorkedHours;
+    public int HoursLeft => Project.WorkHoursLeft;
 
     private void NotifyChange()
     {

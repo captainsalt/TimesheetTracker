@@ -14,7 +14,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Margin="5">
-                        <TextBlock Text="{Binding Model.Name}" Width="100"/>
+                        <TextBlock Text="{Binding Project.Name}" Width="100"/>
 
                         <ItemsControl ItemsSource="{Binding Days}">
                             <ItemsControl.ItemsPanel>
