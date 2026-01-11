@@ -51,4 +51,28 @@ public class TimesheetFillerTests
         projectA.TotalWorkedHours.ShouldBe(10);
         projectB.TotalWorkedHours.ShouldBe(10);
     }
+
+    [Fact]
+    public void FillTimesheet_ShouldFillFromSmallestDays()
+    {
+        // Arrange
+        var timesheet = new Timesheet(1998, 7);
+        var projectData = new[]
+        {
+            (Name: "Project A", Max: 66),
+            (Name: "Project B", Max: 20),
+            (Name: "Project C", Max: 10),
+            (Name: "Project D", Max: 2),
+            (Name: "Project E", Max: 55),
+            (Name: "Project F", Max: 3)
+        };
+
+        foreach (var p in projectData) timesheet.CreateProject(p.Name, p.Max);
+
+        //Act 
+        TimesheetFiller.FillTimesheet(timesheet);
+
+        //Assert
+        timesheet.SheetDailyHours(1).ShouldBe(TimesheetFiller.MAX_DAILY_HOURS);
+    }
 }

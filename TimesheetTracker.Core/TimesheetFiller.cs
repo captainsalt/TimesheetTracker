@@ -10,13 +10,12 @@ public static class TimesheetFiller
 
         while (IncompleteDays(timesheet).Any())
         {
-            foreach (var day in IncompleteDays(timesheet))
-            {
-                if (GetIncompleteProject(timesheet) is not { } project)
-                    return timesheet;
+            var day = IncompleteDays(timesheet).First();
 
-                project.AddWorkHours(day.day, 1);
-            }
+            if (GetIncompleteProject(timesheet) is not { } project)
+                return timesheet;
+
+            project.AddWorkHours(day.day, 1);
         }
 
         return timesheet;
