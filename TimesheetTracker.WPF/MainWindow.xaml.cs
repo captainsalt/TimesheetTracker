@@ -22,7 +22,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 {
     public ObservableCollection<ProjectViewModel> ProjectViewModels { get; } = [];
     public Timesheet Sheet { get; } = new(1997, 7);
-
     public int GrandTotal => Sheet.TotalWorkedHours;
 
     public MainWindow()
@@ -33,9 +32,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             (Name: "Project X", Max: 1000), 
             (Name: "Project A", Max: 66),
-            (Name: "Project B", Max: 20),
+            (Name: "Project B", Max: 20), 
             (Name: "Project C", Max: 10),
-            (Name: "Project D", Max: 2),
+            (Name: "Project D", Max: 2), 
             (Name: "Project E", Max: 55),
             (Name: "Project F", Max: 3)
         };
@@ -43,7 +42,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         foreach (var p in projectData)
         {
             var project = Sheet.CreateProject(p.Name, p.Max);
-            ProjectViewModels.Add(new ProjectViewModel(project, () => OnPropertyChanged(nameof(GrandTotal))));
+            var vm = new ProjectViewModel(project);
+
+            // Subscribe to project changes to update Grand Total
+            vm.TotalsChanged += (s, e) => OnPropertyChanged(nameof(GrandTotal));
+
+            ProjectViewModels.Add(vm);
         }
 
         DataContext = this;
@@ -54,23 +58,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         TimesheetFiller.FillTimesheet(Sheet);
         foreach (var vm in ProjectViewModels) vm.RefreshAll();
+        OnPropertyChanged(nameof(GrandTotal));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    protected void OnPropertyChanged(string name) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
 
 public partial class DayViewModel : ObservableObject
 {
     private readonly Project _project;
     private readonly int _day;
-    private readonly Action _onChanged;
 
-    public DayViewModel(Project project, int day, Action onChanged)
+    public event EventHandler? HoursChanged;
+
+    public DayViewModel(Project project, int day)
     {
         _project = project;
         _day = day;
-        _onChanged = onChanged;
         _hours = project.GetWorkedHours(day);
     }
 
@@ -81,7 +87,7 @@ public partial class DayViewModel : ObservableObject
     {
         int current = _project.GetWorkedHours(_day);
         _project.AddWorkHours(_day, value - current);
-        _onChanged?.Invoke();
+        HoursChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void RefreshFromModel() => Hours = _project.GetWorkedHours(_day);
@@ -89,16 +95,20 @@ public partial class DayViewModel : ObservableObject
 
 public partial class ProjectViewModel : ObservableObject
 {
-    private readonly Action _onParentChanged;
     public Project Model { get; }
     public List<DayViewModel> Days { get; }
+    public event EventHandler? TotalsChanged;
 
-    public ProjectViewModel(Project project, Action onParentChanged)
+    public ProjectViewModel(Project project)
     {
         Model = project;
-        _onParentChanged = onParentChanged;
-        Days = Enumerable.Range(1, project.TotalWorkedHours + project.WorkHoursLeft == 0 ? 31 : 31) // Using 31 or project logic
-            .Select(d => new DayViewModel(project, d, NotifyChange)).ToList();
+        Days = Enumerable.Range(1, 31) // Ensure DaysInMonth is accessible
+                         .Select(d => new DayViewModel(project, d)).ToList();
+
+        foreach (var day in Days)
+        {
+            day.HoursChanged += (s, e) => NotifyChange();
+        }
     }
 
     public int TotalHours => Model.TotalWorkedHours;
@@ -108,7 +118,7 @@ public partial class ProjectViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(TotalHours));
         OnPropertyChanged(nameof(HoursLeft));
-        _onParentChanged?.Invoke();
+        TotalsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void RefreshAll()

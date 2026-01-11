@@ -22,6 +22,7 @@
                                     <StackPanel Orientation="Horizontal"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
+
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}" Width="30" Margin="2"/>
