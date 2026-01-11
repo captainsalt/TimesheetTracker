@@ -30,7 +30,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         var projectData = new[]
         {
-            (Name: "Project X", Max: 1000), 
             (Name: "Project A", Max: 66),
             (Name: "Project B", Max: 20), 
             (Name: "Project C", Max: 10),
