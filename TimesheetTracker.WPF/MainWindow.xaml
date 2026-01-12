@@ -5,36 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TimesheetTracker.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1250">
-    <StackPanel Margin="5">
-        <Button Command="{Binding FillSheetCommand}">Fill Timesheet</Button>
-        <Button Command="{Binding ClearTimesheetCommand}">Clear Timesheet</Button>
-        <TextBlock Text="{Binding GrandTotal, StringFormat='Grand Total: {0}'}" FontSize="18" FontWeight="Bold"/>
-
-        <ItemsControl ItemsSource="{Binding ProjectViewModels}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Margin="5">
-                        <TextBlock Text="{Binding Project.Name}" Width="100"/>
-
-                        <ItemsControl ItemsSource="{Binding Days}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBox Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}" Width="30" Margin="2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <TextBlock Text="{Binding TotalHours}" Width="50" FontWeight="Bold" Margin="10,0"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        
     </StackPanel>
 </Window>
