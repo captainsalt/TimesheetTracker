@@ -8,6 +8,7 @@
         Title="MainWindow" Height="450" Width="1250">
     <StackPanel Margin="5">
         <Button Command="{Binding FillSheetCommand}">Fill Timesheet</Button>
+        <Button Command="{Binding ClearTimesheetCommand}">Clear Timesheet</Button>
         <TextBlock Text="{Binding GrandTotal, StringFormat='Grand Total: {0}'}" FontSize="18" FontWeight="Bold"/>
 
         <ItemsControl ItemsSource="{Binding ProjectViewModels}">

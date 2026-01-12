@@ -18,22 +18,25 @@ namespace TimesheetTracker.WPF;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window, INotifyPropertyChanged
+public partial class MainWindow : Window
 {
-    public ObservableCollection<ProjectViewModel> ProjectViewModels { get; } = [];
-    public Timesheet Sheet { get; } = new(DateTime.Now.Year, DateTime.Now.Month);
-    public int GrandTotal => Sheet.TotalWorkedHours;
-
     public MainWindow()
     {
         InitializeComponent();
+        DataContext = new MainWindowViewModel();
+    }
+}
 
+public partial class MainWindowViewModel : ObservableObject
+{
+    public MainWindowViewModel()
+    {
         var projectData = new[]
         {
             (Name: "Project A", Max: 66),
-            (Name: "Project B", Max: 20), 
+            (Name: "Project B", Max: 20),
             (Name: "Project C", Max: 10),
-            (Name: "Project D", Max: 2), 
+            (Name: "Project D", Max: 2),
             (Name: "Project E", Max: 55),
             (Name: "Project F", Max: 3)
         };
@@ -43,14 +46,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var project = Sheet.CreateProject(p.Name, p.Max);
             var vm = new ProjectViewModel(project);
 
-            // Subscribe to project changes to update Grand Total
             vm.TotalsChanged += (s, e) => OnPropertyChanged(nameof(GrandTotal));
-
             ProjectViewModels.Add(vm);
         }
-
-        DataContext = this;
     }
+
+    public ObservableCollection<ProjectViewModel> ProjectViewModels { get; } = [];
+    public Timesheet Sheet { get; } = new(DateTime.Now.Year, DateTime.Now.Month);
+    public int GrandTotal => Sheet.TotalWorkedHours;
 
     [RelayCommand]
     private void FillSheet()
@@ -59,10 +62,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         foreach (var vm in ProjectViewModels) vm.RefreshAll();
         OnPropertyChanged(nameof(GrandTotal));
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged(string name) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
 
 public partial class DayViewModel(Project project, int day) : ObservableObject
@@ -71,7 +70,7 @@ public partial class DayViewModel(Project project, int day) : ObservableObject
 
     [ObservableProperty]
     private int _hours = project.GetWorkedHours(day);
-
+    
     partial void OnHoursChanged(int value)
     {
         int current = project.GetWorkedHours(day);
@@ -91,8 +90,9 @@ public partial class ProjectViewModel : ObservableObject
     public ProjectViewModel(Project project)
     {
         Project = project;
-        Days = Enumerable.Range(1, project.DaysInMonth) // Ensure DaysInMonth is accessible
-                         .Select(d => new DayViewModel(project, d)).ToList();
+        Days = Enumerable.Range(1, project.DaysInMonth)
+                         .Select(d => new DayViewModel(project, d))
+                         .ToList();
 
         foreach (var day in Days)
         {
