@@ -31,56 +31,52 @@ public partial class MainWindow : Window
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    [ObservableProperty]
-    private Timesheet _timesheet;
-
     public MainWindowViewModel()
     {
-        _timesheet = new(DateTime.Now.Year, DateTime.Now.Month);
+        Timesheet = new(DateTime.Now.Year, DateTime.Now.Month);
 
         new List<(string name, int maxHours)>
         {
-            ("Project A", 90),
-            ("Project B", 80),
-            ("Project C", 70),
-        }.ForEach(p => _timesheet.CreateProject(p.name, p.maxHours));
-
-        ProjectViewModels = [.. _timesheet.Projects.Select(p => new ProjectViewModel(p))];
+            (name: "Project A", maxHours: 66),
+            (name: "Project B", maxHours: 20),
+            (name: "Project C", maxHours: 10),
+            (name: "Project D", maxHours: 2),
+            (name: "Project E", maxHours: 55),
+            (name: "Project F", maxHours: 3)
+        }.ForEach(p => Timesheet.CreateProject(p.name, p.maxHours));
+        ProjectViewModels = new(Timesheet.Projects.Select(p => new ProjectViewModel(p)));
     }
 
     public ObservableCollection<ProjectViewModel> ProjectViewModels { get; set; } = [];
+
+    [ObservableProperty]
+    public partial Timesheet Timesheet { get; set; }
 }
 
-public record HoursChanged();
+public record DayHoursChanged();
 
 public partial class DayViewModel(Project project, int day) : ObservableObject
 {
-    public event EventHandler? HoursChanged;
+    public int Day => day;
 
     [ObservableProperty]
-    private int _hours = project.GetWorkedHours(day);
-
-    public int Day { get; } = day;
+    public partial int Hours { get; set; }
 
     partial void OnHoursChanged(int value)
     {
         int current = project.GetWorkedHours(Day);
         project.AddWorkHours(Day, value - current);
-        WeakReferenceMessenger.Default.Send(new HoursChanged());
+        WeakReferenceMessenger.Default.Send(new DayHoursChanged());
     }
 }
 
-public partial class ProjectViewModel : ObservableObject
+public partial class ProjectViewModel : ObservableObject, IRecipient<DayHoursChanged>
 {
     public ProjectViewModel(Project project)
     {
         Project = project;
-        Days = [.. Enumerable.Range(1, project.DaysInMonth).Select(day => new DayViewModel(project, day))];
-
-        WeakReferenceMessenger.Default.Register<HoursChanged>(this, (r, m) =>
-        {
-            OnDayUpdate();
-        });
+        Days = Enumerable.Range(1, project.DaysInMonth).Select(day => new DayViewModel(project, day)).ToList();
+        WeakReferenceMessenger.Default.RegisterAll(this);
     }
 
     public Project Project { get; }
@@ -89,9 +85,9 @@ public partial class ProjectViewModel : ObservableObject
 
     public int WorkHoursLeft => Project.WorkHoursLeft;
 
-    public ObservableCollection<DayViewModel> Days { get; set; }
+    public List<DayViewModel> Days { get; }
 
-    void OnDayUpdate()
+    public void Receive(DayHoursChanged message)
     {
         OnPropertyChanged(nameof(TotalHours));
         OnPropertyChanged(nameof(WorkHoursLeft));

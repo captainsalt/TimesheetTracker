@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TimesheetTracker.WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="1090">
+
     <StackPanel Margin="1">
         <Button Margin="1">Add Projects</Button>
 
@@ -15,25 +16,25 @@
                 <DataTemplate>
                     <StackPanel Margin="0 2" Orientation="Horizontal">
                         <!--Project Name-->
-                        <TextBlock Text="{Binding Project.Name}" Width="100" FontWeight="Bold"/>
+                        <TextBlock FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Width="100"/>
 
                         <!--Days-->
                         <ItemsControl ItemsSource="{Binding Days}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="{Binding Days.Count}"></UniformGrid>
+                                    <StackPanel Orientation="Horizontal"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBox Width="30" Height="30" TextAlignment="Center" FontSize="20" FontWeight="Bold" Text="{Binding Hours}"></TextBox>
+                                    <TextBox FontWeight="Medium" FontSize="18" Width="20" TextAlignment="Center" Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
                         <!--Total Hours-->
-                        <TextBlock Margin="5 0" Text="{Binding TotalHours}"></TextBlock>
+                        <TextBlock Margin="5 0" FontWeight="Medium" Text="{Binding TotalHours}" FontSize="18"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
