@@ -5,8 +5,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TimesheetTracker.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <StackPanel>
-        
+        Title="MainWindow" Height="450" Width="1090">
+    <StackPanel Margin="1">
+        <Button Margin="1">Add Projects</Button>
+
+        <!--Project View Models -->
+        <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0 2" Orientation="Horizontal">
+                        <!--Project Name-->
+                        <TextBlock Text="{Binding Project.Name}" Width="100" FontWeight="Bold"/>
+
+                        <!--Days-->
+                        <ItemsControl ItemsSource="{Binding Days}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="{Binding Days.Count}"></UniformGrid>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBox Width="30" Height="30" TextAlignment="Center" FontSize="20" FontWeight="Bold" Text="{Binding Hours}"></TextBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!--Total Hours-->
+                        <TextBlock Margin="5 0" Text="{Binding TotalHours}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
     </StackPanel>
 </Window>
