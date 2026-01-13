@@ -10,6 +10,7 @@
     <StackPanel Margin="1">
         <Button Margin="1">Add Projects</Button>
         <Button Margin="1" Command="{Binding FillSheetCommand}">Fill Timesheet</Button>
+        <Button Margin="1" Command="{Binding ClearTimesheetCommand}">Clear Timesheet</Button>
 
         <!--Project View Models -->
         <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}">

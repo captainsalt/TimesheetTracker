@@ -74,44 +74,50 @@ public partial class DayViewModel(Project project, int day) : ObservableObject
     partial void OnHoursChanged(int value)
     {
         int current = project.GetWorkedHours(Day);
+        if (value == current) return;
+
         project.AddWorkHours(Day, value - current);
         WeakReferenceMessenger.Default.Send(new DayHoursChanged());
     }
 
-    public void Refresh() => Hours = project.GetWorkedHours(day);
+    public void Refresh()
+    {
+        Hours = project.GetWorkedHours(day);
+    }
 }
 
-public partial class ProjectViewModel : ObservableObject, IRecipient<DayHoursChanged>, IRecipient<TimesheetFilled>
+public partial class ProjectViewModel :
+    ObservableRecipient,
+    IRecipient<DayHoursChanged>,
+    IRecipient<TimesheetFilled>
 {
+    public Project Project { get; }
+    public List<DayViewModel> Days { get; }
+
     public ProjectViewModel(Project project)
     {
         Project = project;
-        Days = Enumerable.Range(1, project.DaysInMonth).Select(day => new DayViewModel(project, day)).ToList();
-        WeakReferenceMessenger.Default.RegisterAll(this);
-    }
+        Days = Enumerable.Range(1, project.DaysInMonth)
+                         .Select(d => new DayViewModel(project, d))
+                         .ToList();
 
-    public Project Project { get; }
+        IsActive = true;
+    }
 
     public int TotalHours => Project.TotalWorkedHours;
-
     public int WorkHoursLeft => Project.WorkHoursLeft;
 
-    public List<DayViewModel> Days { get; }
-
-    public void Receive(DayHoursChanged message)
-    {
-        OnPropertyChanged(nameof(TotalHours));
-        OnPropertyChanged(nameof(WorkHoursLeft));
-    }
+    public void Receive(DayHoursChanged message) => NotifyCalculations();
 
     public void Receive(TimesheetFilled message)
     {
+        foreach (var day in Days) day.Refresh();
+        NotifyCalculations();
+    }
+
+    private void NotifyCalculations()
+    {
         OnPropertyChanged(nameof(TotalHours));
         OnPropertyChanged(nameof(WorkHoursLeft));
-
-        foreach (var day in Days)
-        {
-            day.Refresh();
-        }
     }
 }
