@@ -51,16 +51,25 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     public partial Timesheet Timesheet { get; set; }
+
+    [RelayCommand]
+    void FillSheet()
+    {
+        TimesheetFiller.FillTimesheet(Timesheet);
+        WeakReferenceMessenger.Default.Send(new TimesheetFilled());
+    }
 }
 
 public record DayHoursChanged();
+
+public record TimesheetFilled();
 
 public partial class DayViewModel(Project project, int day) : ObservableObject
 {
     public int Day => day;
 
     [ObservableProperty]
-    public partial int Hours { get; set; }
+    public partial int Hours { get; set; } = project.GetWorkedHours(day);
 
     partial void OnHoursChanged(int value)
     {
@@ -68,9 +77,11 @@ public partial class DayViewModel(Project project, int day) : ObservableObject
         project.AddWorkHours(Day, value - current);
         WeakReferenceMessenger.Default.Send(new DayHoursChanged());
     }
+
+    public void Refresh() => Hours = project.GetWorkedHours(day);
 }
 
-public partial class ProjectViewModel : ObservableObject, IRecipient<DayHoursChanged>
+public partial class ProjectViewModel : ObservableObject, IRecipient<DayHoursChanged>, IRecipient<TimesheetFilled>
 {
     public ProjectViewModel(Project project)
     {
@@ -91,5 +102,16 @@ public partial class ProjectViewModel : ObservableObject, IRecipient<DayHoursCha
     {
         OnPropertyChanged(nameof(TotalHours));
         OnPropertyChanged(nameof(WorkHoursLeft));
+    }
+
+    public void Receive(TimesheetFilled message)
+    {
+        OnPropertyChanged(nameof(TotalHours));
+        OnPropertyChanged(nameof(WorkHoursLeft));
+
+        foreach (var day in Days)
+        {
+            day.Refresh();
+        }
     }
 }
