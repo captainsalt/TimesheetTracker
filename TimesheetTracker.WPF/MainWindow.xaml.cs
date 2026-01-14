@@ -1,19 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using TimesheetTracker.Core;
 using TimesheetTracker.WPF.Configuration;
 
@@ -39,20 +28,20 @@ public partial class MainWindowViewModel : ObservableObject
     public partial Timesheet Timesheet { get; set; }
 
     [RelayCommand]
-    void FillSheet()
+    private void FillSheet()
     {
         TimesheetFiller.FillTimesheet(Timesheet);
         WeakReferenceMessenger.Default.Send(new TimesheetFilled());
     }
 
     [RelayCommand]
-    void ShowJsonConfig()
+    private void ShowJsonConfig()
     {
         AppConfiguration.ShowJsonConfig();
     }
 
     [RelayCommand]
-    void LoadProjects()
+    private void LoadProjects()
     {
         var config = AppConfiguration.GetConfig();
         if (config is null) return;
