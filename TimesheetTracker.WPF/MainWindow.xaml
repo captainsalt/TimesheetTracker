@@ -8,9 +8,12 @@
         Title="MainWindow" Height="450" Width="1090">
 
     <StackPanel Margin="1">
-        <Button Margin="1">Add Projects</Button>
-        <Button Margin="1" Command="{Binding FillSheetCommand}">Fill Timesheet</Button>
-        <Button Margin="1" Command="{Binding ClearTimesheetCommand}">Clear Timesheet</Button>
+        <UniformGrid Columns="2" Height="70">
+            <Button Margin="1" Command="{Binding ShowJsonConfigCommand}">Show Project JSON</Button>
+            <Button Margin="1" Command="{Binding LoadProjectsCommand}">Load Projects</Button>
+            <Button Margin="1" Command="{Binding FillSheetCommand}">Fill Timesheet</Button>
+            <!--<Button Margin="1" Command="{Binding ClearTimesheetCommand}">Clear Timesheet</Button>-->
+        </UniformGrid>
 
         <!--Project View Models -->
         <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}">

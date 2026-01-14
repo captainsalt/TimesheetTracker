@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TimesheetTracker.Core;
+using TimesheetTracker.WPF.Services;
 
 namespace TimesheetTracker.WPF;
 /// <summary>
@@ -47,7 +48,8 @@ public partial class MainWindowViewModel : ObservableObject
         ProjectViewModels = new(Timesheet.Projects.Select(p => new ProjectViewModel(p)));
     }
 
-    public ObservableCollection<ProjectViewModel> ProjectViewModels { get; set; } = [];
+    [ObservableProperty]
+    public partial ObservableCollection<ProjectViewModel> ProjectViewModels { get; set; } = [];
 
     [ObservableProperty]
     public partial Timesheet Timesheet { get; set; }
@@ -57,6 +59,25 @@ public partial class MainWindowViewModel : ObservableObject
     {
         TimesheetFiller.FillTimesheet(Timesheet);
         WeakReferenceMessenger.Default.Send(new TimesheetFilled());
+    }
+
+    [RelayCommand]
+    void ShowJsonConfig()
+    {
+        AppConfiguration.ShowJsonConfig();
+    }
+
+    [RelayCommand]
+    void LoadProjects()
+    {
+        var config = AppConfiguration.GetConfig();
+        if (config is null) return;
+
+        var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month);
+        config.Projects.ForEach(p => timesheet.CreateProject(p.Name, p.MaxHours));
+
+        Timesheet = timesheet;
+        ProjectViewModels = new(Timesheet.Projects.Select(p => new ProjectViewModel(p)));
     }
 }
 
