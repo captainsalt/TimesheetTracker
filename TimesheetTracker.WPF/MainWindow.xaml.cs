@@ -32,22 +32,6 @@ public partial class MainWindow : Window
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    public MainWindowViewModel()
-    {
-        Timesheet = new(DateTime.Now.Year, DateTime.Now.Month);
-
-        new List<(string name, int maxHours)>
-        {
-            (name: "Project A", maxHours: 66),
-            (name: "Project B", maxHours: 20),
-            (name: "Project C", maxHours: 10),
-            (name: "Project D", maxHours: 2),
-            (name: "Project E", maxHours: 55),
-            (name: "Project F", maxHours: 3)
-        }.ForEach(p => Timesheet.CreateProject(p.name, p.maxHours));
-        ProjectViewModels = new(Timesheet.Projects.Select(p => new ProjectViewModel(p)));
-    }
-
     [ObservableProperty]
     public partial ObservableCollection<ProjectViewModel> ProjectViewModels { get; set; } = [];
 
