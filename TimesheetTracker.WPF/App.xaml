@@ -1,7 +1,7 @@
-﻿<Application x:Class="TimesheetTracker.App"
+﻿<Application x:Class="TimesheetTracker.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:TimesheetTracker"
+             xmlns:local="clr-namespace:TimesheetTracker.WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
