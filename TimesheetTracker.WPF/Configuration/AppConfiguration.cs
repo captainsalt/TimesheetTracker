@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
-namespace TimesheetTracker.WPF.Services;
+namespace TimesheetTracker.WPF.Configuration;
 
 public record ProjectConfig(string Name, int MaxHours, int? CurrentHours);
 public record Config(List<ProjectConfig> Projects);
