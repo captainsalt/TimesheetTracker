@@ -11,11 +11,12 @@ public static class TimesheetFiller
 
         while (IncompleteDays(timesheet).Any())
         {
-            (int day, int _) = IncompleteDays(timesheet).First();
+            var project = GetIncompleteProject(timesheet) ?? GetRandomProject(timesheet);
 
-            if (GetIncompleteProject(timesheet) is not { } project)
+            if (project is null)
                 return timesheet;
 
+            (int day, int _) = IncompleteDays(timesheet).First();
             project[day].WorkHours += 1;
         }
 
@@ -31,10 +32,8 @@ public static class TimesheetFiller
 
     private static Project? GetIncompleteProject(Timesheet timesheet)
     {
-        return timesheet.Projects
-            .Where(p => p.WorkHoursLeft > 0)
-            .OrderBy(p => p.WorkHoursLeft)
-            .FirstOrDefault() ?? GetRandomProject(timesheet);
+        var projects = timesheet.Projects.Where(p => p.WorkHoursLeft > 0).ToList();
+        return projects.ElementAtOrDefault(rng.Next(projects.Count));
     }
 
     private static Project? GetRandomProject(Timesheet timesheet)
