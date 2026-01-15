@@ -3,6 +3,7 @@
 public static class TimesheetFiller
 {
     public const int MAX_DAILY_HOURS = 8;
+    public static Random rng = new();
 
     public static Timesheet FillTimesheet(Timesheet timesheet)
     {
@@ -33,6 +34,21 @@ public static class TimesheetFiller
         return timesheet.Projects
             .Where(p => p.WorkHoursLeft > 0)
             .OrderBy(p => p.WorkHoursLeft)
-            .FirstOrDefault();
+            .FirstOrDefault() ?? GetRandomProject(timesheet);
+    }
+
+    private static Project? GetRandomProject(Timesheet timesheet)
+    {
+        var projects = timesheet.Projects;
+        int totalHours = projects.Sum(p => p.MaxHours);
+        int randomWeight = rng.Next(1, totalHours + 1);
+
+        foreach (var project in projects)
+        {
+            randomWeight -= project.MaxHours;
+            if (randomWeight <= 0) return project;
+        }
+
+        return projects.FirstOrDefault();
     }
 }
