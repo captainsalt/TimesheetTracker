@@ -36,7 +36,7 @@
                         <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="31"/>
+                                    <UniformGrid Columns="{Binding Days.Count}"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
 
