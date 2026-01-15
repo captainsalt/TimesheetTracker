@@ -15,18 +15,18 @@
         </UniformGrid>
 
         <!--Project View Models -->
-        <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}">
+        <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}" Grid.IsSharedSizeScope="True">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0 2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"></ColumnDefinition>
+                            <ColumnDefinition Width="auto" SharedSizeGroup="ProjectNameColumn" MaxWidth="200"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="40"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
                         <!--Project Name-->
-                        <TextBlock Grid.Column="0" VerticalAlignment="Bottom" FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Width="100"/>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Bottom" FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Margin="0 0 5 0"/>
 
                         <!--Days-->
                         <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}">
