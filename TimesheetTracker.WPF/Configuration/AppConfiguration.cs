@@ -24,8 +24,8 @@ public class AppConfiguration
 
         var defaultSettings = new Config(
             Projects: [
-                new ProjectConfig("Project A", MaxHours: 0, CurrentHours: 0),
-                new ProjectConfig("Project B", MaxHours: 0, CurrentHours: 0)
+                new ProjectConfig("Project A", MaxHours: 88, CurrentHours: 0),
+                new ProjectConfig("Project B", MaxHours: 88, CurrentHours: 0)
             ],
             ExcludedDays: []
         );
