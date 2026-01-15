@@ -6,7 +6,7 @@ namespace TimesheetTracker.Tests;
 public class TimesheetFillerTests
 {
     private static int MaxMonthlyHours(Timesheet timesheet) =>
-        timesheet.WorkDays().Count() * TimesheetFiller.MAX_DAILY_HOURS;
+        timesheet.GetBusinessDays().Count() * TimesheetFiller.MAX_DAILY_HOURS;
 
     [Fact]
     public void FillTimesheet_ShouldFillTimesheet()
@@ -67,7 +67,7 @@ public class TimesheetFillerTests
             (Name: "Project F", Max: 3)
         };
 
-        foreach (var p in projectData) timesheet.CreateProject(p.Name, p.Max);
+        foreach (var (Name, Max) in projectData) timesheet.CreateProject(Name, Max);
 
         //Act 
         TimesheetFiller.FillTimesheet(timesheet);

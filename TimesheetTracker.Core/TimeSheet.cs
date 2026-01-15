@@ -18,33 +18,30 @@ public class Day(Project project, int day, int hours, bool isActive = true)
 
 public class Project
 {
-    private readonly List<Day> _workDays;
+    private readonly Dictionary<int, Day> _workDays;
 
     internal Project(
         Timesheet timesheet,
         string name,
         int maxHours,
-        IEnumerable<int> workdays)
+        IEnumerable<int> activeDays)
     {
         Timesheet = timesheet;
         Name = name;
         MaxHours = maxHours;
+
         _workDays = Enumerable.Range(1, timesheet.DaysInMonth)
-                      .Select(day =>
-                      {
-                          return new Day(this, day: day, hours: 0, isActive: workdays.Contains(day));
-                      })
-                      .ToList();
+            .ToDictionary(
+                day => day,
+                day => new Day(this, day, 0, activeDays.Contains(day))
+            );
     }
 
-    public Day this[int day]
-    {
-        get => _workDays.First(d => d.Date == day);
-    }
+    public Day this[int day] => _workDays[day];
     public Timesheet Timesheet { get; }
     public string Name { get; }
     public int MaxHours { get; }
-    public int TotalWorkedHours => _workDays.Sum(d => d.WorkHours);
+    public int TotalWorkedHours => _workDays.Values.Sum(d => d.WorkHours);
     public int WorkHoursLeft => MaxHours - TotalWorkedHours;
 }
 
@@ -61,12 +58,12 @@ public class Timesheet(int year, int month)
         if (Projects.Any(p => p.Name == name))
             throw new ArgumentException("Project already exists.");
 
-        var project = new Project(this, name, maxHours, WorkDays());
+        var project = new Project(this, name, maxHours, GetBusinessDays());
         Projects.Add(project);
         return project;
     }
 
-    public IEnumerable<int> WorkDays()
+    public IEnumerable<int> GetBusinessDays()
     {
         return Enumerable.Range(1, DaysInMonth)
             .Where(day =>

@@ -23,7 +23,7 @@ public static class TimesheetFiller
 
     private static IEnumerable<(int day, int hours)> IncompleteDays(Timesheet timesheet)
     {
-        return timesheet.WorkDays()
+        return timesheet.GetBusinessDays()
             .Select((day, hours) => (day, hours: timesheet.SheetDailyHours(day)))
             .Where(day => day.hours < MAX_DAILY_HOURS);
     }
