@@ -60,11 +60,9 @@ public record TimesheetFilled();
 
 public partial class DayViewModel(Day day) : ObservableObject
 {
-    public Day Day => day;
-
     [ObservableProperty]
     public partial int Hours { get; set; } = day.WorkHours;
-
+    public Day Day => day;
     public bool IsActive { get; } = day.IsActive;
 
     partial void OnHoursChanged(int value)

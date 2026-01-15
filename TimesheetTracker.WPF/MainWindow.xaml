@@ -26,7 +26,7 @@
                         </Grid.ColumnDefinitions>
 
                         <!--Project Name-->
-                        <TextBlock Grid.Column="0" FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Width="100"/>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Bottom" FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Width="100"/>
 
                         <!--Days-->
                         <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}">
@@ -38,17 +38,20 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBox FontWeight="Medium" 
+                                    <StackPanel>
+                                        <Label FontWeight="Medium" Content="{Binding Day.Date}" HorizontalContentAlignment="Center"></Label>
+                                        <TextBox FontWeight="Medium" 
                                              FontSize="18" 
                                              TextAlignment="Center" 
                                              IsEnabled="{Binding IsActive}" 
                                              Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
                         <!--Total Hours-->
-                        <TextBlock Grid.Column="2" HorizontalAlignment="Right" Margin="5 0" FontWeight="Medium" Text="{Binding TotalHours}" FontSize="18"></TextBlock>
+                        <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5 0" FontWeight="Medium" Text="{Binding TotalHours}" FontSize="18"></TextBlock>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
