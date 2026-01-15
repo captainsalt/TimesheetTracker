@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="875" MinWidth="875" MinHeight="450">
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
     <StackPanel Margin="1">
         <UniformGrid Columns="3" Height="50">
             <Button Margin="1" Command="{Binding ShowJsonConfigCommand}">Show Project JSON</Button>
@@ -38,12 +42,12 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel>
-                                        <Label FontWeight="Medium" Content="{Binding Day.Date}" HorizontalContentAlignment="Center"></Label>
+                                    <StackPanel Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}">
+                                        <Label IsEnabled="{Binding IsActive}" FontWeight="Medium" Content="{Binding Day.Date}" HorizontalContentAlignment="Center"></Label>
                                         <TextBox FontWeight="Medium" 
                                              FontSize="18" 
                                              TextAlignment="Center" 
-                                             IsEnabled="{Binding IsActive}" 
+                                             IsEnabled="{Binding IsActive}"
                                              Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
                                 </DataTemplate>
