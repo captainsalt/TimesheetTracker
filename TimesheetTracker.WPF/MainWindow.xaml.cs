@@ -93,7 +93,7 @@ public partial class ProjectViewModel :
     public ProjectViewModel(Project project)
     {
         Project = project;
-        Days = Enumerable.Range(1, project.DaysInMonth)
+        Days = Enumerable.Range(1, project.Timesheet.DaysInMonth)
                          .Select(d => new DayViewModel(project[d]))
                          .ToList();
 

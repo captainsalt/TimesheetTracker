@@ -18,16 +18,18 @@ public class Day(Project project, int day, int hours, bool isActive = true)
 
 public class Project
 {
+    private readonly List<Day> _workDays;
+
     internal Project(
         Timesheet timesheet,
         string name,
         int maxHours,
         IEnumerable<int> workdays)
     {
+        Timesheet = timesheet;
         Name = name;
         MaxHours = maxHours;
-        DaysInMonth = timesheet.DaysInMonth;
-        WorkDays = Enumerable.Range(1, timesheet.DaysInMonth)
+        _workDays = Enumerable.Range(1, timesheet.DaysInMonth)
                       .Select(day =>
                       {
                           return new Day(this, day: day, hours: 0, isActive: workdays.Contains(day));
@@ -37,14 +39,12 @@ public class Project
 
     public Day this[int day]
     {
-        get => WorkDays.First(d => d.Date == day);
-        set => WorkDays.First(d => d.Date == day).WorkHours = value.WorkHours;
+        get => _workDays.First(d => d.Date == day);
     }
-    private List<Day> WorkDays { get; set; }
+    public Timesheet Timesheet { get; }
     public string Name { get; }
     public int MaxHours { get; }
-    public int DaysInMonth { get; }
-    public int TotalWorkedHours => WorkDays.Sum(d => d.WorkHours);
+    public int TotalWorkedHours => _workDays.Sum(d => d.WorkHours);
     public int WorkHoursLeft => MaxHours - TotalWorkedHours;
 }
 
