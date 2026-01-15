@@ -1,11 +1,17 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TimesheetTracker.WPF.Configuration;
 
-public record ProjectConfig(string Name, int MaxHours, int? CurrentHours);
-public record Config(List<ProjectConfig> Projects, List<int> ExcludedDays);
+public record ProjectConfig(
+    [property: JsonRequired] string Name,
+    [property: JsonRequired] int MaxHours,
+    int? CurrentHours);
+public record Config(
+    [property: JsonRequired] List<ProjectConfig> Projects,
+    [property: JsonRequired] List<int> ExcludedDays);
 
 public class AppConfiguration
 {
@@ -14,29 +20,49 @@ public class AppConfiguration
         "TimesheetTracker",
         "settings.json"));
 
+    private static JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
+
     static AppConfiguration()
     {
         if (_settingsPath.Exists)
             return;
 
+        InitConfig();
+    }
+
+    private static void InitConfig()
+    {
         if (_settingsPath.Directory is { Exists: false } directory)
             directory.Create();
 
-        var defaultSettings = new Config(
+        using var writer = _settingsPath.CreateText();
+        writer.Write(JsonSerializer.Serialize(DefaultConfig(), _serializerOptions));
+    }
+
+    private static Config DefaultConfig()
+    {
+        return new Config(
             Projects: [
                 new ProjectConfig("Project A", MaxHours: 88, CurrentHours: 0),
-                new ProjectConfig("Project B", MaxHours: 88, CurrentHours: 0)
+                new ProjectConfig("Project B", MaxHours: 88, CurrentHours: 0),
             ],
             ExcludedDays: []
         );
-
-        using var writer = _settingsPath.CreateText();
-        writer.Write(JsonSerializer.Serialize(defaultSettings));
     }
 
     public static FileInfo SettingsPath => _settingsPath;
 
     public static void ShowJsonConfig() => Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
 
-    public static Config? GetConfig() => JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
+    public static Config? GetConfig()
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
+        }
+        catch (JsonException)
+        {
+            return DefaultConfig();
+        }
+    }
 }
