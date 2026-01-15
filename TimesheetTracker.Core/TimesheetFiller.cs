@@ -10,12 +10,12 @@ public static class TimesheetFiller
 
         while (IncompleteDays(timesheet).Any())
         {
-            var day = IncompleteDays(timesheet).First();
+            (int day, int _) = IncompleteDays(timesheet).First();
 
             if (GetIncompleteProject(timesheet) is not { } project)
                 return timesheet;
 
-            project.AddWorkHours(day.day, 1);
+            project[day].WorkHours += 1;
         }
 
         return timesheet;
@@ -23,7 +23,7 @@ public static class TimesheetFiller
 
     private static IEnumerable<(int day, int hours)> IncompleteDays(Timesheet timesheet)
     {
-        return Enumerable.Range(1, timesheet.DaysInMonth)
+        return timesheet.WorkDays()
             .Select((day, hours) => (day, hours: timesheet.SheetDailyHours(day)))
             .Where(day => day.hours < MAX_DAILY_HOURS);
     }

@@ -58,25 +58,27 @@ public record DayHoursChanged();
 
 public record TimesheetFilled();
 
-public partial class DayViewModel(Project project, int day) : ObservableObject
+public partial class DayViewModel(Day day) : ObservableObject
 {
-    public int Day => day;
+    public Day Day => day;
 
     [ObservableProperty]
-    public partial int Hours { get; set; } = project.GetWorkedHours(day);
+    public partial int Hours { get; set; } = day.WorkHours;
+
+    public bool IsActive { get; } = day.IsActive;
 
     partial void OnHoursChanged(int value)
     {
-        int current = project.GetWorkedHours(Day);
+        int current = day.WorkHours;
         if (value == current) return;
 
-        project.AddWorkHours(Day, value - current);
+        day.WorkHours += value - current;
         WeakReferenceMessenger.Default.Send(new DayHoursChanged());
     }
 
     public void Refresh()
     {
-        Hours = project.GetWorkedHours(day);
+        Hours = day.WorkHours;
     }
 }
 
@@ -92,7 +94,7 @@ public partial class ProjectViewModel :
     {
         Project = project;
         Days = Enumerable.Range(1, project.DaysInMonth)
-                         .Select(d => new DayViewModel(project, d))
+                         .Select(d => new DayViewModel(project[d]))
                          .ToList();
 
         IsActive = true;

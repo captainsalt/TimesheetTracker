@@ -6,7 +6,7 @@ namespace TimesheetTracker.Tests;
 public class TimesheetFillerTests
 {
     private static int MaxMonthlyHours(Timesheet timesheet) =>
-        timesheet.DaysInMonth * TimesheetFiller.MAX_DAILY_HOURS;
+        timesheet.WorkDays().Count() * TimesheetFiller.MAX_DAILY_HOURS;
 
     [Fact]
     public void FillTimesheet_ShouldFillTimesheet()

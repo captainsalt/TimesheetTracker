@@ -38,7 +38,11 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBox FontWeight="Medium" FontSize="18" TextAlignment="Center" Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    <TextBox FontWeight="Medium" 
+                                             FontSize="18" 
+                                             TextAlignment="Center" 
+                                             IsEnabled="{Binding IsActive}" 
+                                             Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
