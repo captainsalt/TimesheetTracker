@@ -51,7 +51,10 @@ public partial class MainWindowViewModel : ObservableObject
         var config = AppConfiguration.GetConfig();
         if (config is null) return;
 
-        var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month);
+        var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month)
+        {
+            ExcludedDays = config.ExcludedDays
+        };
         config.Projects.ForEach(p => timesheet.CreateProject(p.Name, p.MaxHours - (p.CurrentHours ?? 0)));
 
         Timesheet = timesheet;

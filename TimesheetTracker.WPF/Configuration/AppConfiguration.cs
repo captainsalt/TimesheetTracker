@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace TimesheetTracker.WPF.Configuration;
 
 public record ProjectConfig(string Name, int MaxHours, int? CurrentHours);
-public record Config(List<ProjectConfig> Projects);
+public record Config(List<ProjectConfig> Projects, List<int> ExcludedDays);
 
 public class AppConfiguration
 {
@@ -22,10 +22,13 @@ public class AppConfiguration
         if (_settingsPath.Directory is { Exists: false } directory)
             directory.Create();
 
-        var defaultSettings = new Config([
-            new ProjectConfig("Project A", MaxHours: 0, CurrentHours: 0),
+        var defaultSettings = new Config(
+            Projects: [
+                new ProjectConfig("Project A", MaxHours: 0, CurrentHours: 0),
                 new ProjectConfig("Project B", MaxHours: 0, CurrentHours: 0)
-        ]);
+            ],
+            ExcludedDays: []
+        );
 
         using var writer = _settingsPath.CreateText();
         writer.Write(JsonSerializer.Serialize(defaultSettings));

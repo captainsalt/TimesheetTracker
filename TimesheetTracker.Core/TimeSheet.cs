@@ -24,7 +24,7 @@ public class Project
         Timesheet timesheet,
         string name,
         int maxHours,
-        IEnumerable<int> activeDays)
+        IEnumerable<int> businessDays)
     {
         Timesheet = timesheet;
         Name = name;
@@ -33,7 +33,7 @@ public class Project
         _workDays = Enumerable.Range(1, timesheet.DaysInMonth)
             .ToDictionary(
                 day => day,
-                day => new Day(this, day, 0, activeDays.Contains(day))
+                day => new Day(this, day, 0, businessDays.Contains(day))
             );
     }
 
@@ -51,6 +51,7 @@ public class Timesheet(int year, int month)
     public int Month { get; } = month;
     public int DaysInMonth { get; } = DateTime.DaysInMonth(year, month);
     public List<Project> Projects { get; } = [];
+    public List<int> ExcludedDays { get; set; } = [];
     public int TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
 
     public Project CreateProject(string name, int maxHours)
@@ -63,16 +64,10 @@ public class Timesheet(int year, int month)
         return project;
     }
 
-    public IEnumerable<int> GetBusinessDays(List<int>? excludedDays = null)
+    public IEnumerable<int> GetBusinessDays()
     {
         return Enumerable.Range(1, DaysInMonth)
-            .Where(day =>
-            {
-                if (excludedDays is null)
-                    return true;
-
-                return excludedDays.Contains(day) == false;
-            })
+            .Where(day => ExcludedDays.Contains(day) == false)
             .Where(day =>
             {
                 var dayOfWeek = new DateTime(Year, Month, day).DayOfWeek;
