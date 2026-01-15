@@ -21,11 +21,16 @@ public partial class MainWindow : Window
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    public MainWindowViewModel()
+    {
+        LoadProjects();
+    }
+
     [ObservableProperty]
     public partial ObservableCollection<ProjectViewModel> ProjectViewModels { get; set; } = [];
 
     [ObservableProperty]
-    public partial Timesheet Timesheet { get; set; }
+    public partial Timesheet Timesheet { get; set; } = new Timesheet(DateTime.Now.Year, DateTime.Now.Month);
 
     [RelayCommand]
     private void FillSheet()

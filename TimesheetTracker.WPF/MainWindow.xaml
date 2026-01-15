@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TimesheetTracker.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="900" MinWidth="700" MinHeight="255">
+        Title="MainWindow" Height="450" Width="875" MinWidth="875" MinHeight="450">
 
     <StackPanel Margin="1">
         <UniformGrid Columns="3" Height="50">
@@ -51,7 +51,7 @@
                         </ItemsControl>
 
                         <!--Total Hours-->
-                        <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5 0" FontWeight="Medium" Text="{Binding TotalHours}" FontSize="18"></TextBlock>
+                        <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontWeight="Medium" Text="{Binding TotalHours}" FontSize="18"></TextBlock>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
