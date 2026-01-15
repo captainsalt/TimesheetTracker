@@ -63,9 +63,16 @@ public class Timesheet(int year, int month)
         return project;
     }
 
-    public IEnumerable<int> GetBusinessDays()
+    public IEnumerable<int> GetBusinessDays(List<int>? excludedDays = null)
     {
         return Enumerable.Range(1, DaysInMonth)
+            .Where(day =>
+            {
+                if (excludedDays is null)
+                    return true;
+
+                return excludedDays.Contains(day) == false;
+            })
             .Where(day =>
             {
                 var dayOfWeek = new DateTime(Year, Month, day).DayOfWeek;
