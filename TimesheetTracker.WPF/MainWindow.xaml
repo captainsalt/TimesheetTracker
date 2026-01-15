@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TimesheetTracker.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1090">
+        Title="MainWindow" Height="450" Width="900" MinWidth="700" MinHeight="255">
 
     <StackPanel Margin="1">
         <UniformGrid Columns="3" Height="50">
@@ -18,28 +18,34 @@
         <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0 2" Orientation="Horizontal">
+                    <Grid Margin="0 2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="40"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
                         <!--Project Name-->
-                        <TextBlock FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Width="100"/>
+                        <TextBlock Grid.Column="0" FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Width="100"/>
 
                         <!--Days-->
-                        <ItemsControl ItemsSource="{Binding Days}">
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
+                                    <UniformGrid Columns="31"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBox FontWeight="Medium" FontSize="18" Width="20" TextAlignment="Center" Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    <TextBox FontWeight="Medium" FontSize="18" TextAlignment="Center" Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
                         <!--Total Hours-->
-                        <TextBlock Margin="5 0" FontWeight="Medium" Text="{Binding TotalHours}" FontSize="18"></TextBlock>
-                    </StackPanel>
+                        <TextBlock Grid.Column="2" HorizontalAlignment="Right" Margin="5 0" FontWeight="Medium" Text="{Binding TotalHours}" FontSize="18"></TextBlock>
+                    </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
