@@ -16,19 +16,19 @@ public class AppConfiguration
 
     static AppConfiguration()
     {
-        if (!_settingsPath.Exists)
-        {
-            if (_settingsPath.Directory is { Exists: false } directory)
-                directory.Create();
+        if (_settingsPath.Exists)
+            return;
 
-            var defaultSettings = new Config([
-                new ProjectConfig("Project A", MaxHours: 0, CurrentHours: 0),
+        if (_settingsPath.Directory is { Exists: false } directory)
+            directory.Create();
+
+        var defaultSettings = new Config([
+            new ProjectConfig("Project A", MaxHours: 0, CurrentHours: 0),
                 new ProjectConfig("Project B", MaxHours: 0, CurrentHours: 0)
-            ]);
+        ]);
 
-            using var writer = _settingsPath.CreateText();
-            writer.Write(JsonSerializer.Serialize(defaultSettings));
-        }
+        using var writer = _settingsPath.CreateText();
+        writer.Write(JsonSerializer.Serialize(defaultSettings));
     }
 
     public static FileInfo SettingsPath => _settingsPath;
