@@ -24,10 +24,8 @@ public class AppConfiguration
 
     static AppConfiguration()
     {
-        if (_settingsPath.Exists)
-            return;
-
-        InitConfig();
+        if (_settingsPath.Exists == false)
+            InitConfig();
     }
 
     private static void InitConfig()
