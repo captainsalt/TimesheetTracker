@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Windows.Navigation;
 
 namespace TimesheetTracker.WPF.Configuration;
 
@@ -17,25 +16,20 @@ public record Config(
 
 public class AppConfiguration
 {
-    private static readonly FileInfo _settingsPath = new(Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-        "TimesheetTracker",
-        "settings.json"));
-
     private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
     static AppConfiguration()
     {
-        if (_settingsPath.Exists == false)
+        if (SettingsPath.Exists == false)
             InitConfig();
     }
 
     private static void InitConfig()
     {
-        if (_settingsPath.Directory is { Exists: false } directory)
+        if (SettingsPath.Directory is { Exists: false } directory)
             directory.Create();
 
-        using var writer = _settingsPath.CreateText();
+        using StreamWriter writer = SettingsPath.CreateText();
         writer.Write(JsonSerializer.Serialize(ConfigTemplate("Placeholder Project"), _serializerOptions));
     }
 
@@ -49,20 +43,26 @@ public class AppConfiguration
         );
     }
 
-    public static FileInfo SettingsPath => _settingsPath;
+    public static FileInfo SettingsPath { get; } = new(Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        "TimesheetTracker",
+        "settings.json"));
 
-    public static void ShowJsonConfig() => Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
+    public static void ShowJsonConfig()
+    {
+        _ = Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
+    }
 
     public static bool TryReadConfig(out Config? config)
     {
         try
         {
-            config =  JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
+            config = JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
             return true;
         }
         catch (JsonException)
         {
-            config =  ConfigTemplate("<ERROR LOADING CONFIG>");
+            config = ConfigTemplate("<ERROR LOADING CONFIG>");
             return false;
         }
     }

@@ -35,8 +35,8 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void FillSheet()
     {
-        TimesheetFiller.FillTimesheet(Timesheet);
-        WeakReferenceMessenger.Default.Send(new TimesheetFilled());
+        _ = TimesheetFiller.FillTimesheet(Timesheet);
+        _ = WeakReferenceMessenger.Default.Send(new TimesheetFilled());
     }
 
     [RelayCommand]
@@ -48,7 +48,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void LoadProjects()
     {
-        _ = AppConfiguration.TryReadConfig(out var config);
+        _ = AppConfiguration.TryReadConfig(out Config? config);
         if (config is null) return;
 
         var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month)
@@ -56,9 +56,9 @@ public partial class MainWindowViewModel : ObservableObject
             ExcludedDays = config.ExcludedDays,
         };
 
-        foreach (var configProject in config.Projects)
+        foreach (ProjectConfig configProject in config.Projects)
         {
-            timesheet.CreateProject(
+            _ = timesheet.CreateProject(
                 configProject.Name,
                 configProject.MaxHours - (configProject.CurrentHours ?? 0m),
                 configProject.DailyMinimum ?? 0m);
@@ -90,7 +90,7 @@ public partial class DayViewModel(Day day) : ObservableObject
         if (value == current) return;
 
         day.WorkHours += value - current;
-        WeakReferenceMessenger.Default.Send(new DayHoursChanged());
+        _ = WeakReferenceMessenger.Default.Send(new DayHoursChanged());
     }
 
     public void Refresh()
@@ -120,11 +120,14 @@ public partial class ProjectViewModel :
     public decimal TotalHours => Project.TotalWorkedHours;
     public decimal WorkHoursLeft => Project.WorkHoursLeft;
 
-    public void Receive(DayHoursChanged message) => NotifyCalculations();
+    public void Receive(DayHoursChanged message)
+    {
+        NotifyCalculations();
+    }
 
     public void Receive(TimesheetFilled message)
     {
-        foreach (var day in Days) day.Refresh();
+        foreach (DayViewModel day in Days) day.Refresh();
         NotifyCalculations();
     }
 

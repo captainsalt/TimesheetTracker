@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace TimesheetTracker.Core;
 
 public static class TimesheetFiller
@@ -11,9 +10,9 @@ public static class TimesheetFiller
     {
         ArgumentNullException.ThrowIfNull(timesheet);
 
-        foreach (var project in timesheet.Projects.Where(p => p.DailyMinimum > 0))
+        foreach (Project? project in timesheet.Projects.Where(p => p.DailyMinimum > 0))
         {
-            foreach (var day in project.Where(d => d.IsActive))
+            foreach (Day? day in project.Where(d => d.IsActive))
             {
                 day.WorkHours += project.DailyMinimum;
             }
@@ -21,7 +20,7 @@ public static class TimesheetFiller
 
         while (IncompleteDays(timesheet).FirstOrDefault() is { } incompleteDay)
         {
-            var project = GetIncompleteProject(timesheet) ?? GetRandomProject(timesheet);
+            Project? project = GetIncompleteProject(timesheet) ?? GetRandomProject(timesheet);
 
             if (project is null)
                 return timesheet;
@@ -48,11 +47,11 @@ public static class TimesheetFiller
 
     private static Project? GetRandomProject(Timesheet timesheet)
     {
-        var projects = timesheet.Projects;
+        List<Project> projects = timesheet.Projects;
         decimal totalHours = projects.Sum(p => Math.Ceiling(p.MaxHours));
         decimal randomWeight = rng.Next(1, (int)Math.Ceiling(totalHours + 1));
 
-        foreach (var project in projects)
+        foreach (Project project in projects)
         {
             randomWeight -= Math.Ceiling(project.MaxHours);
             if (randomWeight <= 0) return project;

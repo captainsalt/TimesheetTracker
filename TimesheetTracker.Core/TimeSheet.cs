@@ -82,10 +82,13 @@ public class Timesheet(int year, int month)
             .Where(day => ExcludedDays.Contains(day) == false)
             .Where(day =>
             {
-                var dayOfWeek = new DateTime(Year, Month, day).DayOfWeek;
-                return dayOfWeek != DayOfWeek.Sunday && dayOfWeek != DayOfWeek.Saturday;
+                DayOfWeek dayOfWeek = new DateTime(Year, Month, day).DayOfWeek;
+                return dayOfWeek is not DayOfWeek.Sunday and not DayOfWeek.Saturday;
             });
     }
 
-    public decimal SheetDailyHours(int day) => Projects.Sum(p => p[day].WorkHours);
+    public decimal SheetDailyHours(int day)
+    {
+        return Projects.Sum(p => p[day].WorkHours);
+    }
 }
