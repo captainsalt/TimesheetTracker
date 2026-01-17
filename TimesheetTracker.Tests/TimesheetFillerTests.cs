@@ -29,13 +29,16 @@ public class TimesheetFillerTests
     {
         // Arrange
         var timesheet = new Timesheet(1998, 7);
-        Project project = timesheet.CreateProject("Project A", 300);
+        _ = timesheet.CreateProject("Project A", MaxMonthlyHours(timesheet) * 10);
+        _ = timesheet.CreateProject("Project B", MaxMonthlyHours(timesheet) * 10, dailyMinimum: 2);
 
         //Act 
         TimesheetFiller.FillTimesheet(timesheet);
+        TimesheetFiller.FillTimesheet(timesheet);
+        TimesheetFiller.FillTimesheet(timesheet);
 
         //Assert
-        project.TotalWorkedHours.ShouldBe(MaxMonthlyHours(timesheet));
+        timesheet.TotalWorkedHours.ShouldBe(MaxMonthlyHours(timesheet));
     }
 
     [Fact]
