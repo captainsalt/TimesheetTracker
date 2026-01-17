@@ -19,14 +19,14 @@ public static class TimesheetFiller
             }
         }
 
-        while (IncompleteDays(timesheet).Any())
+        while (IncompleteDays(timesheet).FirstOrDefault() is { } incompleteDay)
         {
             var project = GetIncompleteProject(timesheet) ?? GetRandomProject(timesheet);
 
             if (project is null)
                 return timesheet;
 
-            (int day, decimal currentHours) = IncompleteDays(timesheet).First();
+            (int day, decimal currentHours) = incompleteDay;
             project[day].WorkHours += Math.Min(1, MAX_DAILY_HOURS - currentHours);
         }
 
