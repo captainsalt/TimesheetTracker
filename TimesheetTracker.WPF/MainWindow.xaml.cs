@@ -48,7 +48,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void LoadProjects()
     {
-        var config = AppConfiguration.GetConfig();
+        _ = AppConfiguration.TryReadConfig(out var config);
         if (config is null) return;
 
         var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month)
@@ -56,9 +56,12 @@ public partial class MainWindowViewModel : ObservableObject
             ExcludedDays = config.ExcludedDays,
         };
 
-        foreach (var project in config.Projects)
+        foreach (var configProject in config.Projects)
         {
-            timesheet.CreateProject(project.Name, project.MaxHours - (project.CurrentHours ?? 0));
+            timesheet.CreateProject(
+                configProject.Name,
+                configProject.MaxHours - (configProject.CurrentHours ?? 0m),
+                configProject.DailyMinimum ?? 0m);
         }
 
         Timesheet = timesheet;

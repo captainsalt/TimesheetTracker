@@ -1,4 +1,6 @@
-﻿namespace TimesheetTracker.Core;
+﻿using System.Collections;
+
+namespace TimesheetTracker.Core;
 
 /// <summary>
 /// 
@@ -14,7 +16,7 @@ public class Day(Project project, int day, int hours, bool isActive = true)
     public bool IsActive { get; set; } = isActive;
 }
 
-public class Project
+public class Project : IEnumerable<Day>
 {
     private readonly Dictionary<int, Day> _workDays;
 
@@ -22,12 +24,13 @@ public class Project
         Timesheet timesheet,
         string name,
         decimal maxHours,
+        decimal dailyMinimum,
         IEnumerable<int> businessDays)
     {
         Timesheet = timesheet;
         Name = name;
         MaxHours = maxHours;
-
+        DailyMinimum = dailyMinimum;
         _workDays = Enumerable.Range(1, timesheet.DaysInMonth)
             .ToDictionary(
                 day => day,
@@ -39,8 +42,19 @@ public class Project
     public Timesheet Timesheet { get; }
     public string Name { get; }
     public decimal MaxHours { get; }
+    public decimal DailyMinimum { get; }
     public decimal TotalWorkedHours => _workDays.Values.Sum(d => d.WorkHours);
     public decimal WorkHoursLeft => MaxHours - TotalWorkedHours;
+
+    public IEnumerator<Day> GetEnumerator()
+    {
+        return _workDays.Values.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
 public class Timesheet(int year, int month)
@@ -52,12 +66,12 @@ public class Timesheet(int year, int month)
     public List<int> ExcludedDays { get; set; } = [];
     public decimal TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
 
-    public Project CreateProject(string name, int maxHours)
+    public Project CreateProject(string name, decimal maxHours, decimal dailyMinimum = 0)
     {
         if (Projects.Any(p => p.Name == name))
             throw new ArgumentException("Project already exists.");
 
-        var project = new Project(this, name, maxHours, GetBusinessDays());
+        var project = new Project(this, name, maxHours, dailyMinimum, GetBusinessDays());
         Projects.Add(project);
         return project;
     }

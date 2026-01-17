@@ -2,13 +2,15 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows.Navigation;
 
 namespace TimesheetTracker.WPF.Configuration;
 
 public record ProjectConfig(
     [property: JsonRequired] string Name,
-    [property: JsonRequired] int MaxHours,
-    int? CurrentHours);
+    [property: JsonRequired] decimal MaxHours,
+    decimal? CurrentHours,
+    decimal? DailyMinimum);
 public record Config(
     [property: JsonRequired] List<ProjectConfig> Projects,
     [property: JsonRequired] List<int> ExcludedDays);
@@ -34,15 +36,14 @@ public class AppConfiguration
             directory.Create();
 
         using var writer = _settingsPath.CreateText();
-        writer.Write(JsonSerializer.Serialize(DefaultConfig(), _serializerOptions));
+        writer.Write(JsonSerializer.Serialize(ConfigTemplate("Placeholder Project"), _serializerOptions));
     }
 
-    private static Config DefaultConfig()
+    private static Config ConfigTemplate(string projectName)
     {
         return new Config(
             Projects: [
-                new ProjectConfig("---", MaxHours: 10, CurrentHours: 0),
-                new ProjectConfig("---", MaxHours: 10, CurrentHours: 0),
+                new ProjectConfig(projectName, MaxHours: 10, CurrentHours: 0, DailyMinimum: 0),
             ],
             ExcludedDays: []
         );
@@ -52,15 +53,17 @@ public class AppConfiguration
 
     public static void ShowJsonConfig() => Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
 
-    public static Config? GetConfig()
+    public static bool TryReadConfig(out Config? config)
     {
         try
         {
-            return JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
+            config =  JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
+            return true;
         }
         catch (JsonException)
         {
-            return DefaultConfig();
+            config =  ConfigTemplate("<ERROR LOADING CONFIG>");
+            return false;
         }
     }
 }

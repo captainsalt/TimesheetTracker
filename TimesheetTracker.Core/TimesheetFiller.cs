@@ -11,6 +11,14 @@ public static class TimesheetFiller
     {
         ArgumentNullException.ThrowIfNull(timesheet);
 
+        foreach (var project in timesheet.Projects.Where(p => p.DailyMinimum > 0))
+        {
+            foreach (var day in project.Where(d => d.IsActive))
+            {
+                day.WorkHours += project.DailyMinimum;
+            }
+        }
+
         while (IncompleteDays(timesheet).Any())
         {
             var project = GetIncompleteProject(timesheet) ?? GetRandomProject(timesheet);
