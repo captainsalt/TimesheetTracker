@@ -14,7 +14,8 @@ public static class TimesheetFiller
         {
             foreach (Day? day in project.Where(d => d.IsActive))
             {
-                day.WorkHours += project.DailyMinimum;
+                if (day.WorkHours < project.DailyMinimum)
+                    day.WorkHours += project.DailyMinimum;
             }
         }
 

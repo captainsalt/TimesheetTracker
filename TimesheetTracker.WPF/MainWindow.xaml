@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TimesheetTracker.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="875" MinWidth="875" MinHeight="450">
+        Title="Timesheet Tracker"  MinWidth="1200" MinHeight="450">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -26,7 +26,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" SharedSizeGroup="ProjectNameColumn" MaxWidth="200"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
                         <!--Project Name-->
@@ -42,7 +42,7 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel>
                                         <Label IsEnabled="{Binding IsActive}" FontWeight="Medium" Content="{Binding Day.Date}" HorizontalContentAlignment="Center"></Label>
                                         <TextBox
                                              FontWeight="Medium" 

@@ -53,17 +53,26 @@ public class AppConfiguration
         _ = Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
     }
 
-    public static bool TryReadConfig(out Config? config)
+    public static (bool hasError, Config? config) GetConfig()
     {
         try
         {
-            config = JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
-            return true;
+            var config = JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
+            return (false, config);
         }
         catch (JsonException)
         {
-            config = ConfigTemplate("<ERROR LOADING CONFIG>");
-            return false;
+            var config = ConfigTemplate("<ERROR LOADING CONFIG>");
+            return (true, config);
+        }
+        catch (FileNotFoundException)
+        {
+            InitConfig();
+            return GetConfig();
+        }
+        catch (Exception)
+        {
+            throw;
         }
     }
 }

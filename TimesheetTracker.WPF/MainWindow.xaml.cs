@@ -48,7 +48,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void LoadProjects()
     {
-        _ = AppConfiguration.TryReadConfig(out Config? config);
+        (bool _, Config? config) = AppConfiguration.GetConfig();
         if (config is null) return;
 
         var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month)
