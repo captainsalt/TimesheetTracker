@@ -77,13 +77,13 @@ public record TimesheetFilled();
 public partial class DayViewModel(Day day) : ObservableObject
 {
     [ObservableProperty]
-    public partial int Hours { get; set; } = day.WorkHours;
+    public partial decimal Hours { get; set; } = day.WorkHours;
     public Day Day => day;
     public bool IsActive { get; } = day.IsActive;
 
-    partial void OnHoursChanged(int value)
+    partial void OnHoursChanged(decimal value)
     {
-        int current = day.WorkHours;
+        var current = day.WorkHours;
         if (value == current) return;
 
         day.WorkHours += value - current;
@@ -114,8 +114,8 @@ public partial class ProjectViewModel :
         IsActive = true;
     }
 
-    public int TotalHours => Project.TotalWorkedHours;
-    public int WorkHoursLeft => Project.WorkHoursLeft;
+    public decimal TotalHours => Project.TotalWorkedHours;
+    public decimal WorkHoursLeft => Project.WorkHoursLeft;
 
     public void Receive(DayHoursChanged message) => NotifyCalculations();
 

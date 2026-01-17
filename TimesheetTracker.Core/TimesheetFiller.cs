@@ -1,4 +1,6 @@
-﻿namespace TimesheetTracker.Core;
+﻿using System;
+
+namespace TimesheetTracker.Core;
 
 public static class TimesheetFiller
 {
@@ -16,14 +18,14 @@ public static class TimesheetFiller
             if (project is null)
                 return timesheet;
 
-            (int day, int _) = IncompleteDays(timesheet).First();
-            project[day].WorkHours += 1;
+            (int day, decimal currentHours) = IncompleteDays(timesheet).First();
+            project[day].WorkHours += Math.Min(1, MAX_DAILY_HOURS - currentHours);
         }
 
         return timesheet;
     }
 
-    private static IEnumerable<(int day, int hours)> IncompleteDays(Timesheet timesheet)
+    private static IEnumerable<(int day, decimal hours)> IncompleteDays(Timesheet timesheet)
     {
         return timesheet.GetBusinessDays()
             .Select((day, hours) => (day, hours: timesheet.SheetDailyHours(day)))
@@ -39,12 +41,12 @@ public static class TimesheetFiller
     private static Project? GetRandomProject(Timesheet timesheet)
     {
         var projects = timesheet.Projects;
-        int totalHours = projects.Sum(p => p.MaxHours);
-        int randomWeight = rng.Next(1, totalHours + 1);
+        decimal totalHours = projects.Sum(p => Math.Ceiling(p.MaxHours));
+        decimal randomWeight = rng.Next(1, (int)Math.Ceiling(totalHours + 1));
 
         foreach (var project in projects)
         {
-            randomWeight -= project.MaxHours;
+            randomWeight -= Math.Ceiling(project.MaxHours);
             if (randomWeight <= 0) return project;
         }
 

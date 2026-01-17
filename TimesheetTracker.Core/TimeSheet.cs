@@ -10,7 +10,7 @@ public class Day(Project project, int day, int hours, bool isActive = true)
 {
     public Project Project { get; } = project;
     public int Date { get; set; } = day;
-    public int WorkHours { get; set; } = hours;
+    public decimal WorkHours { get; set; } = hours;
     public bool IsActive { get; set; } = isActive;
 }
 
@@ -21,7 +21,7 @@ public class Project
     internal Project(
         Timesheet timesheet,
         string name,
-        int maxHours,
+        decimal maxHours,
         IEnumerable<int> businessDays)
     {
         Timesheet = timesheet;
@@ -38,9 +38,9 @@ public class Project
     public Day this[int day] => _workDays[day];
     public Timesheet Timesheet { get; }
     public string Name { get; }
-    public int MaxHours { get; }
-    public int TotalWorkedHours => _workDays.Values.Sum(d => d.WorkHours);
-    public int WorkHoursLeft => MaxHours - TotalWorkedHours;
+    public decimal MaxHours { get; }
+    public decimal TotalWorkedHours => _workDays.Values.Sum(d => d.WorkHours);
+    public decimal WorkHoursLeft => MaxHours - TotalWorkedHours;
 }
 
 public class Timesheet(int year, int month)
@@ -50,7 +50,7 @@ public class Timesheet(int year, int month)
     public int DaysInMonth { get; } = DateTime.DaysInMonth(year, month);
     public List<Project> Projects { get; } = [];
     public List<int> ExcludedDays { get; set; } = [];
-    public int TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
+    public decimal TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
 
     public Project CreateProject(string name, int maxHours)
     {
@@ -73,5 +73,5 @@ public class Timesheet(int year, int month)
             });
     }
 
-    public int SheetDailyHours(int day) => Projects.Sum(p => p[day].WorkHours);
+    public decimal SheetDailyHours(int day) => Projects.Sum(p => p[day].WorkHours);
 }
