@@ -41,8 +41,8 @@ public class AppConfiguration
     {
         return new Config(
             Projects: [
-                new ProjectConfig("Project A", MaxHours: 88, CurrentHours: 0),
-                new ProjectConfig("Project B", MaxHours: 88, CurrentHours: 0),
+                new ProjectConfig("---", MaxHours: 10, CurrentHours: 0),
+                new ProjectConfig("---", MaxHours: 10, CurrentHours: 0),
             ],
             ExcludedDays: []
         );
