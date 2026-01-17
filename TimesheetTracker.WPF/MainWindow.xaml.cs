@@ -53,12 +53,20 @@ public partial class MainWindowViewModel : ObservableObject
 
         var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month)
         {
-            ExcludedDays = config.ExcludedDays
+            ExcludedDays = config.ExcludedDays,
         };
-        config.Projects.ForEach(p => timesheet.CreateProject(p.Name, p.MaxHours - (p.CurrentHours ?? 0)));
+
+        foreach (var project in config.Projects)
+        {
+            timesheet.CreateProject(project.Name, project.MaxHours - (project.CurrentHours ?? 0));
+        }
 
         Timesheet = timesheet;
-        ProjectViewModels = new(Timesheet.Projects.Select(p => new ProjectViewModel(p)));
+    }
+
+    partial void OnTimesheetChanged(Timesheet value)
+    {
+        ProjectViewModels = new(value.Projects.Select(p => new ProjectViewModel(p)));
     }
 }
 
