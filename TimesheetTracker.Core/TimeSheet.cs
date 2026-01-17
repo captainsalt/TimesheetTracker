@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace TimesheetTracker.Core;
+﻿namespace TimesheetTracker.Core;
 
 /// <summary>
 /// 

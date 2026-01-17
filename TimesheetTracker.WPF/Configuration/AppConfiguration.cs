@@ -20,7 +20,7 @@ public class AppConfiguration
         "TimesheetTracker",
         "settings.json"));
 
-    private static JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
     static AppConfiguration()
     {
