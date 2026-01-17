@@ -35,7 +35,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void FillSheet()
     {
-        _ = TimesheetFiller.FillTimesheet(Timesheet);
+        TimesheetFiller.FillTimesheet(Timesheet);
         _ = WeakReferenceMessenger.Default.Send(new TimesheetFilled());
     }
 

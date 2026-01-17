@@ -6,7 +6,7 @@ public static class TimesheetFiller
     public const int MAX_DAILY_HOURS = 8;
     public static readonly Random rng = new();
 
-    public static Timesheet FillTimesheet(Timesheet timesheet)
+    public static void FillTimesheet(Timesheet timesheet)
     {
         ArgumentNullException.ThrowIfNull(timesheet);
 
@@ -18,18 +18,16 @@ public static class TimesheetFiller
             }
         }
 
-        while (IncompleteDays(timesheet).FirstOrDefault() is { } incompleteDay)
+        while (IncompleteDays(timesheet).FirstOrDefault() is { day: > 0 } incompleteDay)
         {
             Project? project = GetIncompleteProject(timesheet) ?? GetRandomProject(timesheet);
 
             if (project is null)
-                return timesheet;
+                return;
 
             (int day, decimal currentHours) = incompleteDay;
             project[day].WorkHours += Math.Min(1, MAX_DAILY_HOURS - currentHours);
         }
-
-        return timesheet;
     }
 
     private static IEnumerable<(int day, decimal hours)> IncompleteDays(Timesheet timesheet)

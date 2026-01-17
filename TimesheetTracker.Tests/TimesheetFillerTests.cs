@@ -18,7 +18,7 @@ public class TimesheetFillerTests
         _ = timesheet.CreateProject("Project A", MaxMonthlyHours(timesheet));
 
         //Act 
-        _ = TimesheetFiller.FillTimesheet(timesheet);
+        TimesheetFiller.FillTimesheet(timesheet);
 
         //Assert
         timesheet.TotalWorkedHours.ShouldBe(MaxMonthlyHours(timesheet));
@@ -32,7 +32,7 @@ public class TimesheetFillerTests
         Project project = timesheet.CreateProject("Project A", 300);
 
         //Act 
-        _ = TimesheetFiller.FillTimesheet(timesheet);
+        TimesheetFiller.FillTimesheet(timesheet);
 
         //Assert
         project.TotalWorkedHours.ShouldBe(MaxMonthlyHours(timesheet));
@@ -47,7 +47,7 @@ public class TimesheetFillerTests
         Project projectB = timesheet.CreateProject("Project B", 10);
 
         //Act 
-        _ = TimesheetFiller.FillTimesheet(timesheet);
+        TimesheetFiller.FillTimesheet(timesheet);
 
         //Assert
         projectA.TotalWorkedHours.ShouldBeGreaterThan(0);
@@ -72,7 +72,7 @@ public class TimesheetFillerTests
         foreach ((string? Name, int Max) in projectData) _ = timesheet.CreateProject(Name, Max);
 
         //Act 
-        _ = TimesheetFiller.FillTimesheet(timesheet);
+        TimesheetFiller.FillTimesheet(timesheet);
 
         //Assert
         timesheet.SheetDailyHours(1).ShouldBe(TimesheetFiller.MAX_DAILY_HOURS);
