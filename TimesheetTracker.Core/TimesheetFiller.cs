@@ -3,7 +3,7 @@
 public static class TimesheetFiller
 {
     public const int MAX_DAILY_HOURS = 8;
-    public static Random rng = new();
+    public static readonly Random rng = new();
 
     public static Timesheet FillTimesheet(Timesheet timesheet)
     {
