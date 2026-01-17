@@ -44,7 +44,8 @@
                                 <DataTemplate>
                                     <StackPanel Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}">
                                         <Label IsEnabled="{Binding IsActive}" FontWeight="Medium" Content="{Binding Day.Date}" HorizontalContentAlignment="Center"></Label>
-                                        <TextBox FontWeight="Medium" 
+                                        <TextBox
+                                             FontWeight="Medium" 
                                              FontSize="18" 
                                              TextAlignment="Center" 
                                              IsEnabled="{Binding IsActive}"
