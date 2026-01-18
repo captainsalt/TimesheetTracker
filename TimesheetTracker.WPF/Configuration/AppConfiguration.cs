@@ -50,7 +50,7 @@ public class AppConfiguration
 
     public static void ShowJsonConfig()
     {
-        _ = Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
+        using var _ = Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
     }
 
     public static (bool hasError, Config? config) GetConfig()
