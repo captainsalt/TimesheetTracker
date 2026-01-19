@@ -41,7 +41,7 @@ public static class TimesheetFiller
     private static Project? GetIncompleteProject(Timesheet timesheet)
     {
         var projects = timesheet.Projects.Where(p => p.WorkHoursLeft > 0).ToList();
-        return projects.ElementAtOrDefault(rng.Next(projects.Count));
+        return projects.ElementAtOrDefault(rng.Next(projects.Count - 1));
     }
 
     private static Project? GetRandomProject(Timesheet timesheet)
