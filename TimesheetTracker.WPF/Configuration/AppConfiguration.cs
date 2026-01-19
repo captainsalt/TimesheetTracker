@@ -18,19 +18,13 @@ public class AppConfiguration
 {
     private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
-    static AppConfiguration()
-    {
-        if (SettingsPath.Exists == false)
-            InitConfig();
-    }
-
-    private static void InitConfig()
+    private static async Task InitConfig()
     {
         if (SettingsPath.Directory is { Exists: false } directory)
             directory.Create();
 
         using StreamWriter writer = SettingsPath.CreateText();
-        writer.Write(JsonSerializer.Serialize(ConfigTemplate("Placeholder Project"), _serializerOptions));
+        await writer.WriteAsync(JsonSerializer.Serialize(ConfigTemplate("Placeholder Project"), _serializerOptions));
     }
 
     private static Config ConfigTemplate(string projectName)
@@ -53,11 +47,11 @@ public class AppConfiguration
         using var _ = Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
     }
 
-    public static (bool hasError, Config? config) GetConfig()
+    public async static Task<(bool hasError, Config? config)> GetConfig()
     {
         try
         {
-            var config = JsonSerializer.Deserialize<Config>(File.ReadAllText(SettingsPath.FullName));
+            var config = await JsonSerializer.DeserializeAsync<Config>(SettingsPath.OpenRead());
             return (false, config);
         }
         catch (JsonException)
@@ -67,8 +61,8 @@ public class AppConfiguration
         }
         catch (FileNotFoundException)
         {
-            InitConfig();
-            return GetConfig();
+            await InitConfig();
+            return await GetConfig();
         }
         catch (Exception)
         {

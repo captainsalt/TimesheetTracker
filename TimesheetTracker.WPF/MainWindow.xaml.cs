@@ -23,7 +23,7 @@ public partial class MainWindowViewModel : ObservableObject
 {
     public MainWindowViewModel()
     {
-        LoadProjects();
+        _ = LoadProjects();
     }
 
     [ObservableProperty]
@@ -46,9 +46,9 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void LoadProjects()
+    private async Task LoadProjects()
     {
-        (bool _, Config? config) = AppConfiguration.GetConfig();
+        (bool _, Config? config) = await AppConfiguration.GetConfig();
         if (config is null) return;
 
         var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month)
