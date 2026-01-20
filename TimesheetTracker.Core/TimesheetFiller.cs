@@ -1,4 +1,6 @@
 ﻿
+using System.Reflection.Metadata.Ecma335;
+
 namespace TimesheetTracker.Core;
 
 public static class TimesheetFiller
@@ -41,7 +43,11 @@ public static class TimesheetFiller
     private static Project? GetIncompleteProject(Timesheet timesheet)
     {
         var projects = timesheet.Projects.Where(p => p.WorkHoursLeft > 0).ToList();
-        return projects.ElementAtOrDefault(rng.Next(projects.Count - 1));
+        return projects switch
+        {
+            [] => null,
+            _ => projects.ElementAtOrDefault(rng.Next(projects.Count - 1))
+        };
     }
 
     private static Project? GetRandomProject(Timesheet timesheet)
