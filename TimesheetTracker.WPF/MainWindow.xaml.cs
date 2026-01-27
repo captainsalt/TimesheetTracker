@@ -69,7 +69,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnTimesheetChanged(Timesheet value)
     {
-        ProjectViewModels = new(value.Projects.Select(p => new ProjectViewModel(p)));
+        ProjectViewModels = new(value.Projects.Select(p => new ProjectViewModel(p, Timesheet.DaysInMonth)));
     }
 }
 
@@ -107,10 +107,10 @@ public partial class ProjectViewModel :
     public Project Project { get; }
     public List<DayViewModel> Days { get; }
 
-    public ProjectViewModel(Project project)
+    public ProjectViewModel(Project project, int daysInMonth)
     {
         Project = project;
-        Days = Enumerable.Range(1, project.Timesheet.DaysInMonth)
+        Days = Enumerable.Range(1, daysInMonth)
                          .Select(d => new DayViewModel(project[d]))
                          .ToList();
 

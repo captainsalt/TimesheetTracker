@@ -8,62 +8,50 @@ namespace TimesheetTracker.Core;
 /// <param name="day"></param>
 /// <param name="hours"></param>
 /// <param name="isActive">If allowed to allocate hours to the day</param>
-public class Day(Project project, int day, int hours, bool isActive = true)
+public class Day(int day, int hours, bool isActive = true)
 {
-    public Project Project { get; } = project;
     public int Date { get; set; } = day;
     public decimal WorkHours { get; set; } = hours;
     public bool IsActive { get; set; } = isActive;
 }
 
-public class Project : IEnumerable<Day>
+public class Project
 {
     private readonly Dictionary<int, Day> _workDays;
 
     internal Project(
-        Timesheet timesheet,
+        int daysInMonth,
         string name,
         decimal maxHours,
         decimal dailyMinimum,
         IEnumerable<int> businessDays)
     {
-        Timesheet = timesheet;
         Name = name;
         MaxHours = maxHours;
         DailyMinimum = dailyMinimum;
-        _workDays = Enumerable.Range(1, timesheet.DaysInMonth)
+        _workDays = Enumerable.Range(1, daysInMonth)
             .ToDictionary(
                 day => day,
-                day => new Day(this, day, 0, businessDays.Contains(day))
+                day => new Day(day, 0, businessDays.Contains(day))
             );
     }
 
     public Day this[int day] => _workDays[day];
-    public Timesheet Timesheet { get; }
-    public string Name { get; }
-    public decimal MaxHours { get; }
-    public decimal DailyMinimum { get; }
+    public IReadOnlyDictionary<int, Day> WorkDays => _workDays;
+    public string Name { get; init; }
+    public decimal MaxHours { get; init; }
+    public decimal DailyMinimum { get; init; }
     public decimal TotalWorkedHours => _workDays.Values.Sum(d => d.WorkHours);
     public decimal WorkHoursLeft => MaxHours - TotalWorkedHours;
-
-    public IEnumerator<Day> GetEnumerator()
-    {
-        return _workDays.Values.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
 }
 
 public class Timesheet(int year, int month)
 {
-    public int Year { get; } = year;
-    public int Month { get; } = month;
-    public int DaysInMonth { get; } = DateTime.DaysInMonth(year, month);
-    public List<Project> Projects { get; } = [];
-    public List<int> ExcludedDays { get; set; } = [];
+    public int Year { get; init; } = year;
+    public int Month { get; init; } = month;
+    public int DaysInMonth { get; init; } = DateTime.DaysInMonth(year, month);
+    public List<Project> Projects { get; init; } = [];
+    public List<int> ExcludedDays { get; init; } = [];
     public decimal TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
 
     public Project CreateProject(string name, decimal maxHours, decimal dailyMinimum = 0)
@@ -71,7 +59,7 @@ public class Timesheet(int year, int month)
         if (Projects.Any(p => p.Name == name))
             throw new ArgumentException("Project already exists.");
 
-        var project = new Project(this, name, maxHours, dailyMinimum, GetBusinessDays());
+        var project = new Project(DaysInMonth, name, maxHours, dailyMinimum, GetBusinessDays());
         Projects.Add(project);
         return project;
     }
