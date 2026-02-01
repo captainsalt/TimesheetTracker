@@ -10,7 +10,7 @@ namespace TimesheetTracker.Core;
 /// <param name="isActive">If allowed to allocate hours to the day</param>
 public class Day(int day, int hours, bool isActive = true)
 {
-    public int Date { get; set; } = day;
+    public int Date { get; init; } = day;
     public decimal WorkHours { get; set; } = hours;
     public bool IsActive { get; set; } = isActive;
 }
