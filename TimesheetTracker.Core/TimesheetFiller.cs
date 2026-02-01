@@ -1,7 +1,4 @@
-﻿
-using System.Reflection.Metadata.Ecma335;
-
-namespace TimesheetTracker.Core;
+﻿namespace TimesheetTracker.Core;
 
 public static class TimesheetFiller
 {

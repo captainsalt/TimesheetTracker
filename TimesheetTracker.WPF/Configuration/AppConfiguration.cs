@@ -47,7 +47,7 @@ public class AppConfiguration
         using var _ = Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
     }
 
-    public async static Task<(bool hasError, Config? config)> GetConfig()
+    public static async Task<(bool hasError, Config? config)> GetConfig()
     {
         try
         {
