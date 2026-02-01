@@ -49,7 +49,7 @@ public class Timesheet(int year, int month)
 {
     public int Year { get; init; } = year;
     public int Month { get; init; } = month;
-    public int DaysInMonth { get; init; } = DateTime.DaysInMonth(year, month);
+    public int DaysInMonth => DateTime.DaysInMonth(Year, Month); 
     public List<Project> Projects { get; init; } = [];
     public List<int> ExcludedDays { get; init; } = [];
     public decimal TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
