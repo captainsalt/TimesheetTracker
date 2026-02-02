@@ -78,7 +78,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveTimesheet()
     {
-        var jsonSheet = AppConfiguration.SaveTimesheet(Timesheet);
+        var jsonSheet = AppConfiguration.TimesheetToJson(Timesheet);
 
         var saveFileDialog = new Microsoft.Win32.SaveFileDialog
         {
