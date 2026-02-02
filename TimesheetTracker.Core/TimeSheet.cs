@@ -1,23 +1,27 @@
-﻿using System.Collections;
+﻿using System.Text.Json.Serialization;
 
 namespace TimesheetTracker.Core;
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="day"></param>
-/// <param name="hours"></param>
-/// <param name="isActive">If allowed to allocate hours to the day</param>
-public class Day(int day, int hours, bool isActive = true)
+public class Day
 {
-    public int Date { get; init; } = day;
-    public decimal WorkHours { get; set; } = hours;
-    public bool IsActive { get; set; } = isActive;
+    public Day() { }
+    public Day(int day, decimal hours, bool isActive = true)
+    {
+        Date = day;
+        WorkHours = hours;
+        IsActive = isActive;
+    }
+
+    public int Date { get; set; }
+
+    public decimal WorkHours { get; set; }
+
+    public bool IsActive { get; set; }
 }
 
 public class Project
 {
-    private readonly Dictionary<int, Day> _workDays;
+    public Project() { }
 
     internal Project(
         int daysInMonth,
@@ -29,29 +33,52 @@ public class Project
         Name = name;
         MaxHours = maxHours;
         DailyMinimum = dailyMinimum;
-        _workDays = Enumerable.Range(1, daysInMonth)
+        WorkDays = Enumerable.Range(1, daysInMonth)
             .ToDictionary(
                 day => day,
                 day => new Day(day, 0, businessDays.Contains(day))
             );
     }
 
-    public Day this[int day] => _workDays[day];
-    public IReadOnlyDictionary<int, Day> WorkDays => _workDays;
-    public string Name { get; init; }
-    public decimal MaxHours { get; init; }
-    public decimal DailyMinimum { get; init; }
-    public decimal TotalWorkedHours => _workDays.Values.Sum(d => d.WorkHours);
+    [JsonIgnore]
+    public Day this[int day] => WorkDays[day];
+
+    public string Name { get; set; } = string.Empty;
+
+    public decimal MaxHours { get; set; }
+
+    public decimal DailyMinimum { get; set; }
+
+    public Dictionary<int, Day> WorkDays { get; set; } = [];
+
+    [JsonIgnore]
+    public decimal TotalWorkedHours => WorkDays.Values.Sum(d => d.WorkHours);
+
+    [JsonIgnore]
     public decimal WorkHoursLeft => MaxHours - TotalWorkedHours;
 }
 
-public class Timesheet(int year, int month)
+public class Timesheet
 {
-    public int Year { get; init; } = year;
-    public int Month { get; init; } = month;
-    public int DaysInMonth => DateTime.DaysInMonth(Year, Month); 
-    public List<Project> Projects { get; init; } = [];
-    public List<int> ExcludedDays { get; init; } = [];
+    public Timesheet() { }
+    public Timesheet(int year, int month)
+    {
+        Year = year;
+        Month = month;
+    }
+
+    public int Year { get; set; }
+
+    public int Month { get; set; }
+
+    public List<Project> Projects { get; set; } = [];
+
+    public List<int> ExcludedDays { get; set; } = [];
+
+    [JsonIgnore]
+    public int DaysInMonth => DateTime.DaysInMonth(Year, Month);
+
+    [JsonIgnore]
     public decimal TotalWorkedHours => Projects.Sum(p => p.TotalWorkedHours);
 
     public Project CreateProject(string name, decimal maxHours, decimal dailyMinimum = 0)
@@ -67,16 +94,12 @@ public class Timesheet(int year, int month)
     public IEnumerable<int> GetBusinessDays()
     {
         return Enumerable.Range(1, DaysInMonth)
-            .Where(day => ExcludedDays.Contains(day) == false)
-            .Where(day =>
-            {
-                DayOfWeek dayOfWeek = new DateTime(Year, Month, day).DayOfWeek;
-                return dayOfWeek is not DayOfWeek.Sunday and not DayOfWeek.Saturday;
-            });
+            .Where(day => !ExcludedDays.Contains(day))
+            .Where(day => new DateTime(Year, Month, day).DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday);
     }
 
     public decimal SheetDailyHours(int day)
     {
-        return Projects.Sum(p => p[day].WorkHours);
+        return Projects.Sum(project => project[day].WorkHours);
     }
 }
