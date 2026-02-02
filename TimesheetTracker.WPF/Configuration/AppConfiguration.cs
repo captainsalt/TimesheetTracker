@@ -2,67 +2,52 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TimesheetTracker.Core;
 
 namespace TimesheetTracker.WPF.Configuration;
-
-public record ProjectConfig(
-    [property: JsonRequired] string Name,
-    [property: JsonRequired] decimal MaxHours,
-    decimal? CurrentHours,
-    decimal? DailyMinimum);
-public record Config(
-    [property: JsonRequired] List<ProjectConfig> Projects,
-    [property: JsonRequired] List<int> ExcludedDays);
 
 public class AppConfiguration
 {
     private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
+    public static DirectoryInfo SettingsPath { get; } = new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TimesheetTracker"));
+
     private static async Task InitConfig()
     {
-        if (SettingsPath.Directory is { Exists: false } directory)
-            directory.Create();
-
-        using StreamWriter writer = SettingsPath.CreateText();
-        await writer.WriteAsync(JsonSerializer.Serialize(ConfigTemplate("Placeholder Project"), _serializerOptions));
+        if (!SettingsPath.Exists)
+            SettingsPath.Create();
     }
 
-    private static Config ConfigTemplate(string projectName)
+    private static Timesheet ConfigTemplate()
     {
-        return new Config(
-            Projects: [
-                new ProjectConfig(projectName, MaxHours: 10, CurrentHours: 0, DailyMinimum: 0),
-            ],
-            ExcludedDays: []
-        );
+        return new Timesheet();
     }
-
-    public static FileInfo SettingsPath { get; } = new(Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-        "TimesheetTracker",
-        "settings.json"));
 
     public static void ShowJsonConfig()
     {
-        using var _ = Process.Start("explorer.exe", SettingsPath.Directory!.FullName);
+        using var _ = Process.Start("explorer.exe", SettingsPath.FullName);
     }
 
-    public static async Task<(bool hasError, Config? config)> GetConfig()
+    public static string SaveTimesheet(Timesheet timesheet)
+    {
+        return JsonSerializer.Serialize(timesheet, _serializerOptions);
+    }
+
+    public static async Task<(bool hasError, Timesheet? config)> LoadTimesheet(FileInfo timesheetConfig)
     {
         try
         {
-            var config = await JsonSerializer.DeserializeAsync<Config>(SettingsPath.OpenRead());
+            var config = await JsonSerializer.DeserializeAsync<Timesheet>(timesheetConfig.OpenRead());
             return (false, config);
         }
         catch (JsonException)
         {
-            var config = ConfigTemplate("<ERROR LOADING CONFIG>");
+            var config = ConfigTemplate();
             return (true, config);
         }
         catch (FileNotFoundException)
         {
-            await InitConfig();
-            return await GetConfig();
+            throw;
         }
         catch (Exception)
         {

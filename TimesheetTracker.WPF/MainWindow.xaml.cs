@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,7 +25,7 @@ public partial class MainWindowViewModel : ObservableObject
 {
     public MainWindowViewModel()
     {
-        _ = LoadProjects();
+        _ = LoadTimesheet();
     }
 
     [ObservableProperty]
@@ -46,25 +48,53 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task LoadProjects()
+    private async Task LoadTimesheet()
     {
-        (bool _, Config? config) = await AppConfiguration.GetConfig();
-        if (config is null) return;
-
-        var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month)
+        var openFileDialog = new Microsoft.Win32.OpenFileDialog
         {
-            ExcludedDays = config.ExcludedDays,
+            DefaultExt = ".json",
+            Filter = "JSON files (.json)|*.json|All files (*.*)|*.*"
         };
 
-        foreach (ProjectConfig configProject in config.Projects)
+        bool? result = openFileDialog.ShowDialog();
+
+        if (result is false or null)
         {
-            _ = timesheet.CreateProject(
-                configProject.Name,
-                configProject.MaxHours - (configProject.CurrentHours ?? 0m),
-                configProject.DailyMinimum ?? 0m);
+            MessageBox.Show("No timesheet selected", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        (bool _, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(new FileInfo(openFileDialog.FileName));
+
+        if (timesheet is null)
+        {
+            MessageBox.Show("Could not load configuration timesheet", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
         }
 
         Timesheet = timesheet;
+    }
+
+    [RelayCommand]
+    private async Task SaveTimesheet()
+    {
+        var jsonSheet = AppConfiguration.SaveTimesheet(Timesheet);
+
+        var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+        {
+            FileName = $"Timesheet_{Timesheet.Year}_{Timesheet.Month}.json",
+            DefaultExt = ".json",
+            Filter = "JSON files (.json)|*.json|All files (*.*)|*.*"
+        };
+
+        bool? result = saveFileDialog.ShowDialog();
+
+        if (result is false)
+        {
+            return;
+        }
+
+        await File.WriteAllTextAsync(saveFileDialog.FileName, jsonSheet);
     }
 
     partial void OnTimesheetChanged(Timesheet value)
@@ -81,7 +111,9 @@ public partial class DayViewModel(Day day) : ObservableObject
 {
     [ObservableProperty]
     public partial decimal Hours { get; set; } = day.WorkHours;
+
     public Day Day => day;
+
     public bool IsActive { get; } = day.IsActive;
 
     partial void OnHoursChanged(decimal value)
@@ -117,8 +149,17 @@ public partial class ProjectViewModel :
         IsActive = true;
     }
 
-    public decimal TotalHours => Project.TotalWorkedHours;
+    public decimal TotalWorkedHours => Project.TotalWorkedHours;
+
     public decimal WorkHoursLeft => Project.WorkHoursLeft;
+
+    public decimal MaxHours => Project.MaxHours;
+
+    private void NotifyCalculations()
+    {
+        OnPropertyChanged(nameof(TotalWorkedHours));
+        OnPropertyChanged(nameof(WorkHoursLeft));
+    }
 
     public void Receive(DayHoursChanged message)
     {
@@ -129,11 +170,5 @@ public partial class ProjectViewModel :
     {
         foreach (DayViewModel day in Days) day.Refresh();
         NotifyCalculations();
-    }
-
-    private void NotifyCalculations()
-    {
-        OnPropertyChanged(nameof(TotalHours));
-        OnPropertyChanged(nameof(WorkHoursLeft));
     }
 }
