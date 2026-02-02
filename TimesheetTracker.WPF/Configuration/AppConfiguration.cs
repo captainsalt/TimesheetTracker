@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using TimesheetTracker.Core;
 
 namespace TimesheetTracker.WPF.Configuration;
@@ -10,25 +11,28 @@ public class AppConfiguration
 {
     private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
-    public static DirectoryInfo SettingsPath { get; } = new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TimesheetTracker"));
-
-    private static async Task InitConfig()
-    {
-        if (!SettingsPath.Exists)
-            SettingsPath.Create();
-    }
+    [Obsolete]
+    public static DirectoryInfo SettingsDirectory { get; } = new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TimesheetTracker"));
 
     private static Timesheet ConfigTemplate()
     {
-        return new Timesheet();
+        var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month);
+
+        for (int i = 0; i < 5; i++)
+        {
+            timesheet.CreateProject($"Project {i}", 20);
+        }
+
+        return timesheet;
     }
 
+    [Obsolete]
     public static void ShowJsonConfig()
     {
-        using var _ = Process.Start("explorer.exe", SettingsPath.FullName);
+        using var _ = Process.Start("explorer.exe", SettingsDirectory.FullName);
     }
 
-    public static string SaveTimesheet(Timesheet timesheet)
+    public static string TimesheetToJson(Timesheet timesheet)
     {
         return JsonSerializer.Serialize(timesheet, _serializerOptions);
     }
@@ -47,7 +51,14 @@ public class AppConfiguration
         }
         catch (FileNotFoundException)
         {
-            throw;
+            if (!timesheetConfig.Directory!.Exists)
+            {
+                timesheetConfig.Directory.Create();
+            }
+
+            var timesheetJson = TimesheetToJson(ConfigTemplate());
+            await File.WriteAllTextAsync(timesheetConfig.FullName, timesheetJson);
+            return LoadTimesheet(timesheetConfig).Result;
         }
         catch (Exception)
         {
