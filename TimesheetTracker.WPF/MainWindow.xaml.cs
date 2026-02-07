@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Text.Json;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -42,6 +41,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
+    [Obsolete]
     private void ShowJsonConfig()
     {
         AppConfiguration.ShowJsonConfig();
@@ -60,15 +60,14 @@ public partial class MainWindowViewModel : ObservableObject
 
         if (result is false or null)
         {
-            MessageBox.Show("No timesheet selected", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        (bool _, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(new FileInfo(openFileDialog.FileName));
+        (_, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(new FileInfo(openFileDialog.FileName));
 
         if (timesheet is null)
         {
-            MessageBox.Show("Could not load configuration timesheet", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            _ = MessageBox.Show("Could not load configuration timesheet", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
@@ -78,7 +77,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveTimesheet()
     {
-        var jsonSheet = AppConfiguration.TimesheetToJson(Timesheet);
+        string jsonSheet = AppConfiguration.TimesheetToJson(Timesheet);
 
         var saveFileDialog = new Microsoft.Win32.SaveFileDialog
         {
