@@ -40,7 +40,8 @@ public static class AppConfiguration
 
         try
         {
-            Timesheet? config = await JsonSerializer.DeserializeAsync<Timesheet>(timesheetConfig.OpenRead());
+            using var fileStream = timesheetConfig.OpenRead();
+            Timesheet? config = await JsonSerializer.DeserializeAsync<Timesheet>(fileStream);
             return (true, config);
         }
         catch (JsonException)
