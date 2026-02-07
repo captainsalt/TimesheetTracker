@@ -15,7 +15,7 @@ public static class AppConfiguration
     {
         var timesheet = new Timesheet(DateTime.Now.Year, DateTime.Now.Month);
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i <= 5; i++)
         {
             _ = timesheet.CreateProject($"Project {i}", 20);
         }
