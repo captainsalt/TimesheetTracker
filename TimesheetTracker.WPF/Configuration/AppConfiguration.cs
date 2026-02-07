@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using CommunityToolkit.Mvvm.ComponentModel;
 using TimesheetTracker.Core;
 
 namespace TimesheetTracker.WPF.Configuration;
@@ -20,7 +18,7 @@ public class AppConfiguration
 
         for (int i = 0; i < 5; i++)
         {
-            timesheet.CreateProject($"Project {i}", 20);
+            _ = timesheet.CreateProject($"Project {i}", 20);
         }
 
         return timesheet;
@@ -41,12 +39,12 @@ public class AppConfiguration
     {
         try
         {
-            var config = await JsonSerializer.DeserializeAsync<Timesheet>(timesheetConfig.OpenRead());
+            Timesheet? config = await JsonSerializer.DeserializeAsync<Timesheet>(timesheetConfig.OpenRead());
             return (false, config);
         }
         catch (JsonException)
         {
-            var config = ConfigTemplate();
+            Timesheet config = ConfigTemplate();
             return (true, config);
         }
         catch (FileNotFoundException)
@@ -56,7 +54,7 @@ public class AppConfiguration
                 timesheetConfig.Directory.Create();
             }
 
-            var timesheetJson = TimesheetToJson(ConfigTemplate());
+            string timesheetJson = TimesheetToJson(ConfigTemplate());
             await File.WriteAllTextAsync(timesheetConfig.FullName, timesheetJson);
             return LoadTimesheet(timesheetConfig).Result;
         }
