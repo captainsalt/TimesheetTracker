@@ -5,12 +5,11 @@ using TimesheetTracker.Core;
 
 namespace TimesheetTracker.WPF.Configuration;
 
-public class AppConfiguration
+public static class AppConfiguration
 {
     private static readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
-    [Obsolete]
-    public static DirectoryInfo SettingsDirectory { get; } = new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TimesheetTracker"));
+    public static DirectoryInfo TimesheetDirectory { get; } = new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TimesheetTracker"));
 
     private static Timesheet ConfigTemplate()
     {
@@ -27,7 +26,7 @@ public class AppConfiguration
     [Obsolete]
     public static void ShowJsonConfig()
     {
-        using var _ = Process.Start("explorer.exe", SettingsDirectory.FullName);
+        using var _ = Process.Start("explorer.exe", TimesheetDirectory.FullName);
     }
 
     public static string TimesheetToJson(Timesheet timesheet)
@@ -35,12 +34,14 @@ public class AppConfiguration
         return JsonSerializer.Serialize(timesheet, _serializerOptions);
     }
 
-    public static async Task<(bool hasError, Timesheet? config)> LoadTimesheet(FileInfo timesheetConfig)
+    public static async Task<(bool hasError, Timesheet? timesheet)> LoadTimesheet(int year, int month)
     {
+        FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, $"timesheet_{year}_{month}.json"));
+
         try
         {
             Timesheet? config = await JsonSerializer.DeserializeAsync<Timesheet>(timesheetConfig.OpenRead());
-            return (false, config);
+            return (true, config);
         }
         catch (JsonException)
         {
@@ -49,14 +50,12 @@ public class AppConfiguration
         }
         catch (FileNotFoundException)
         {
-            if (!timesheetConfig.Directory!.Exists)
-            {
-                timesheetConfig.Directory.Create();
-            }
-
+            var configCreation = timesheetConfig.Create().DisposeAsync();
             string timesheetJson = TimesheetToJson(ConfigTemplate());
-            await File.WriteAllTextAsync(timesheetConfig.FullName, timesheetJson);
-            return LoadTimesheet(timesheetConfig).Result;
+            File.WriteAllText(timesheetConfig.FullName, timesheetJson);
+
+            await configCreation;
+            return await LoadTimesheet(year, month);
         }
         catch (Exception)
         {

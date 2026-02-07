@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.VisualBasic;
 using TimesheetTracker.Core;
 using TimesheetTracker.WPF.Configuration;
 
@@ -22,9 +24,12 @@ public partial class MainWindow : Window
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    [GeneratedRegex(@"timesheet_(?<year>\d+)_(?<month>\d+)\.json$")]
+    private static partial Regex TimesheetRegex();
+
     public MainWindowViewModel()
     {
-        _ = LoadTimesheet();
+        _ = LoadTimesheet(DateTime.Now.Year, DateTime.Now.Month);
     }
 
     [ObservableProperty]
@@ -63,7 +68,15 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        (_, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(new FileInfo(openFileDialog.FileName));
+        var matchCollection = TimesheetRegex().Match(openFileDialog.FileName).Groups;
+        var year = int.Parse(matchCollection["year"].Value);
+        var month = int.Parse(matchCollection["month"].Value);
+        await LoadTimesheet(year, month);
+    }
+
+    private async Task LoadTimesheet(int year, int month)
+    {
+        (_, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(year, month);
 
         if (timesheet is null)
         {
@@ -81,7 +94,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         var saveFileDialog = new Microsoft.Win32.SaveFileDialog
         {
-            FileName = $"Timesheet_{Timesheet.Year}_{Timesheet.Month}.json",
+            FileName = $"timesheet_{Timesheet.Year}_{Timesheet.Month}.json",
             DefaultExt = ".json",
             Filter = "JSON files (.json)|*.json|All files (*.*)|*.*"
         };
