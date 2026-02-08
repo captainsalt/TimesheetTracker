@@ -34,6 +34,16 @@ public static class AppConfiguration
         return JsonSerializer.Serialize(timesheet, _serializerOptions);
     }
 
+    public static async Task SaveTimesheet(Timesheet timesheet)
+    {
+        if (!TimesheetDirectory.Exists)
+            TimesheetDirectory.Create();
+
+        string timesheetJson = TimesheetToJson(timesheet);
+        FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, $"timesheet_{timesheet.Year}_{timesheet.Month}.json"));
+        await File.WriteAllTextAsync(timesheetConfig.FullName, timesheetJson);
+    }
+
     public static async Task<(Exception? exception, Timesheet? timesheet)> LoadTimesheet(int year, int month)
     {
         FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, $"timesheet_{year}_{month}.json"));
