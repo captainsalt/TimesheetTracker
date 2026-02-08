@@ -89,23 +89,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveTimesheet()
     {
-        string jsonSheet = AppConfiguration.TimesheetToJson(Timesheet);
-
-        var saveFileDialog = new Microsoft.Win32.SaveFileDialog
-        {
-            FileName = $"timesheet_{Timesheet.Year}_{Timesheet.Month}.json",
-            DefaultExt = ".json",
-            Filter = "JSON files (.json)|*.json|All files (*.*)|*.*"
-        };
-
-        bool? result = saveFileDialog.ShowDialog();
-
-        if (result is false)
-        {
-            return;
-        }
-
-        await File.WriteAllTextAsync(saveFileDialog.FileName, jsonSheet);
+        await AppConfiguration.SaveTimesheet(Timesheet);
     }
 
     partial void OnTimesheetChanged(Timesheet value)
