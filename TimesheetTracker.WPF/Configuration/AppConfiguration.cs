@@ -34,7 +34,7 @@ public static class AppConfiguration
         return JsonSerializer.Serialize(timesheet, _serializerOptions);
     }
 
-    public static async Task<(bool hasError, Timesheet? timesheet)> LoadTimesheet(int year, int month)
+    public static async Task<(Exception? exception, Timesheet? timesheet)> LoadTimesheet(int year, int month)
     {
         FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, $"timesheet_{year}_{month}.json"));
 
@@ -42,12 +42,12 @@ public static class AppConfiguration
         {
             using var fileStream = timesheetConfig.OpenRead();
             Timesheet? config = await JsonSerializer.DeserializeAsync<Timesheet>(fileStream);
-            return (true, config);
+            return (null, config);
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
             Timesheet config = ConfigTemplate();
-            return (true, config);
+            return (ex, config);
         }
         catch (FileNotFoundException)
         {
