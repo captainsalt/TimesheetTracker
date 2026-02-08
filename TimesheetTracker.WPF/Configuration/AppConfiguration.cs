@@ -40,7 +40,7 @@ public static class AppConfiguration
 
         try
         {
-            using var fileStream = timesheetConfig.OpenRead();
+            using FileStream fileStream = timesheetConfig.OpenRead();
             Timesheet? config = await JsonSerializer.DeserializeAsync<Timesheet>(fileStream);
             return (null, config);
         }
@@ -51,11 +51,9 @@ public static class AppConfiguration
         }
         catch (FileNotFoundException)
         {
-            var configCreation = timesheetConfig.Create().DisposeAsync();
             string timesheetJson = TimesheetToJson(ConfigTemplate());
             File.WriteAllText(timesheetConfig.FullName, timesheetJson);
 
-            await configCreation;
             return await LoadTimesheet(year, month);
         }
         catch (Exception)

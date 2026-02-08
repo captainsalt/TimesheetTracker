@@ -5,7 +5,6 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.VisualBasic;
 using TimesheetTracker.Core;
 using TimesheetTracker.WPF.Configuration;
 
@@ -68,9 +67,9 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var matchCollection = TimesheetRegex().Match(openFileDialog.FileName).Groups;
-        var year = int.Parse(matchCollection["year"].Value);
-        var month = int.Parse(matchCollection["month"].Value);
+        GroupCollection matchCollection = TimesheetRegex().Match(openFileDialog.FileName).Groups;
+        int year = int.Parse(matchCollection["year"].Value);
+        int month = int.Parse(matchCollection["month"].Value);
         await LoadTimesheet(year, month);
     }
 
