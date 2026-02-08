@@ -11,10 +11,11 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
-    <StackPanel Margin="1">
-        <UniformGrid Columns="2" Height="50">
+    <StackPanel Margin="1" Grid.IsSharedSizeScope="True">
+        <UniformGrid Columns="3" Height="50">
             <Button Margin="1" Command="{Binding SaveTimesheetCommand}">Save Timesheet</Button>
             <Button Margin="1" Command="{Binding LoadTimesheetCommand}">Load Timesheet</Button>
+            <Button Margin="1" Command="{Binding OpenTimesheetDirectoryCommand}">Open Timesheet Directory</Button>
         </UniformGrid>
 
         <!--Project View Models -->
@@ -68,6 +69,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-
     </StackPanel>
 </Window>

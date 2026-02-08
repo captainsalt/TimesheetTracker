@@ -45,10 +45,9 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    [Obsolete]
-    private void ShowJsonConfig()
+    private void OpenTimesheetDirectory()
     {
-        AppConfiguration.ShowJsonConfig();
+        AppConfiguration.OpenTimesheetDirectory();
     }
 
     [RelayCommand]

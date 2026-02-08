@@ -23,8 +23,7 @@ public static class AppConfiguration
         return timesheet;
     }
 
-    [Obsolete]
-    public static void ShowJsonConfig()
+    public static void OpenTimesheetDirectory()
     {
         using var _ = Process.Start("explorer.exe", TimesheetDirectory.FullName);
     }
