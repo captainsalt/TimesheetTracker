@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TimesheetTracker.WPF"
         mc:Ignorable="d"
-        Title="Timesheet Tracker"  MinWidth="1200" MinHeight="450">
+        Title="Timesheet Tracker"  MinWidth="820" MinHeight="300">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -18,39 +18,59 @@
             <Button Margin="1" Command="{Binding OpenTimesheetDirectoryCommand}">Open Timesheet Directory</Button>
         </UniformGrid>
 
+        <!--Days-->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition SharedSizeGroup="Projects" MaxWidth="200"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition SharedSizeGroup="Hours"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <ItemsControl Grid.Column="1" ItemsSource="{Binding ProjectViewModels[0].Days}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="{Binding ProjectViewModels[0].Days.Count}"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Label HorizontalAlignment="Center" FontWeight="Bold" Content="{Binding Day.Date}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
         <!--Project View Models -->
-        <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}" Grid.IsSharedSizeScope="True">
+        <ItemsControl Margin="1" ItemsSource="{Binding ProjectViewModels}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="0 2">
+                    <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" SharedSizeGroup="Projects" MaxWidth="200"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="*" SharedSizeGroup="Hours"></ColumnDefinition>
+                            <ColumnDefinition SharedSizeGroup="Projects" MaxWidth="200"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition SharedSizeGroup="Hours"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
                         <!--Project Name-->
-                        <TextBlock Grid.Column="0" VerticalAlignment="Bottom" FontSize="18" FontWeight="Medium" Text="{Binding Project.Name}" Margin="0 0 5 0"/>
+                        <TextBlock Grid.Column="0" VerticalAlignment="Bottom" FontSize="18" FontWeight="Medium" Text="{Binding Name}" Margin="0 0 5 0"/>
 
                         <!--Days-->
                         <ItemsControl Grid.Column="1" ItemsSource="{Binding Days}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="{Binding Days.Count}"/>
+                                    <UniformGrid Columns="{Binding Days.Count}" Height="30"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel>
-                                        <Label IsEnabled="{Binding IsActive}" FontWeight="Medium" Content="{Binding Day.Date}" HorizontalContentAlignment="Center"></Label>
                                         <TextBox
                                              FontWeight="Medium" 
-                                             FontSize="18" 
+                                             FontSize="18"
                                              TextAlignment="Center" 
                                              IsEnabled="{Binding IsActive}"
                                              Text="{Binding Hours, UpdateSourceTrigger=PropertyChanged}"/>
-                                    </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -59,9 +79,9 @@
                         <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontWeight="Medium" FontSize="18" Margin="2 0">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}/{1} ({2})">
-                                    <Binding Path="TotalWorkedHours" />
-                                    <Binding Path="MaxHours" />
                                     <Binding Path="WorkHoursLeft" />
+                                    <Binding Path="MaxHours" />
+                                    <Binding Path="TotalWorkedHours" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
