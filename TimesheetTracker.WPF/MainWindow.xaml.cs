@@ -143,6 +143,8 @@ public partial class ProjectViewModel :
         IsActive = true;
     }
 
+    public string Name => Project.Name;
+
     public decimal TotalWorkedHours => Project.TotalWorkedHours;
 
     public decimal WorkHoursLeft => Project.WorkHoursLeft;
