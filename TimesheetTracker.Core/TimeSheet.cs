@@ -91,9 +91,14 @@ public class Timesheet
         return project;
     }
 
+    public IEnumerable<int> GetDays()
+    {
+        return Enumerable.Range(1, DaysInMonth);
+    }
+
     public IEnumerable<int> GetBusinessDays()
     {
-        return Enumerable.Range(1, DaysInMonth)
+        return GetDays()
             .Where(day => !ExcludedDays.Contains(day))
             .Where(day => new DateTime(Year, Month, day).DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday);
     }
