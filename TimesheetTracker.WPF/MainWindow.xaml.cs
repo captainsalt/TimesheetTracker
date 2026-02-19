@@ -21,14 +21,21 @@ public partial class MainWindow : Window
     }
 }
 
-public partial class MainWindowViewModel : ObservableObject
+public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHoursChanged>
 {
     [GeneratedRegex(@"timesheet_(?<year>\d+)_(?<month>\d+)\.json$")]
     private static partial Regex TimesheetRegex();
 
     public MainWindowViewModel()
     {
-        _ = LoadTimesheet(DateTime.Now.Year, DateTime.Now.Month);
+        _ = Initialize();
+    }
+
+    public async Task Initialize()
+    {
+        await LoadTimesheet(DateTime.Now.Year, DateTime.Now.Month);
+        DailyHours = Timesheet.GetDays().ToDictionary(key => key, element => Timesheet.SheetDailyHours(element));
+        IsActive = true;
     }
 
     [ObservableProperty]
@@ -36,6 +43,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     public partial Timesheet Timesheet { get; set; } = new Timesheet(DateTime.Now.Year, DateTime.Now.Month);
+
+    [ObservableProperty]
+    public partial Dictionary<int, decimal> DailyHours { get; set; } = [];
 
     [RelayCommand]
     private void FillSheet()
@@ -95,9 +105,14 @@ public partial class MainWindowViewModel : ObservableObject
     {
         ProjectViewModels = new(value.Projects.Select(p => new ProjectViewModel(p, Timesheet.DaysInMonth)));
     }
+
+    public void Receive(DayHoursChanged message)
+    {
+        DailyHours = Timesheet.GetDays().ToDictionary(key => key, element => Timesheet.SheetDailyHours(element));
+    }
 }
 
-public record DayHoursChanged();
+public record DayHoursChanged(Day Day);
 
 public record TimesheetFilled();
 
@@ -112,16 +127,16 @@ public partial class DayViewModel(Day day) : ObservableObject
 
     partial void OnHoursChanged(decimal value)
     {
-        var current = day.WorkHours;
+        var current = Day.WorkHours;
         if (value == current) return;
 
-        day.WorkHours += value - current;
-        _ = WeakReferenceMessenger.Default.Send(new DayHoursChanged());
+        Day.WorkHours += value - current;
+        _ = WeakReferenceMessenger.Default.Send(new DayHoursChanged(Day));
     }
 
     public void Refresh()
     {
-        Hours = day.WorkHours;
+        Hours = Day.WorkHours;
     }
 }
 

@@ -84,26 +84,26 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <!--<Grid Grid.Row="3">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition SharedSizeGroup="Projects" MaxWidth="200"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition SharedSizeGroup="Hours"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <ItemsControl Grid.Column="1" ItemsSource="{Binding ProjectViewModels}">
+            <ItemsControl Grid.Column="1" ItemsSource="{Binding DailyHours}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="{Binding ProjectViewModels[0].Days.Count}"/>
+                        <UniformGrid Columns="{Binding DailyHours.Count}"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Label HorizontalAlignment="Center" FontWeight="Bold" Content="{Binding Day.Date}"/>
+                        <Label HorizontalAlignment="Center" FontWeight="Bold" Content="{Binding Value}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </Grid>-->
+        </Grid>
     </Grid>
 </Window>
