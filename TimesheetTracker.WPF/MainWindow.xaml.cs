@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -34,7 +33,7 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
     public async Task Initialize()
     {
         await LoadTimesheet(DateTime.Now.Year, DateTime.Now.Month);
-        DailyHours = Timesheet.GetDays().ToDictionary(key => key, element => Timesheet.SheetDailyHours(element));
+        DailyHours = Timesheet.GetDays().ToDictionary(key => key, Timesheet.SheetDailyHours);
         IsActive = true;
     }
 
@@ -108,7 +107,7 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
 
     public void Receive(DayHoursChanged message)
     {
-        DailyHours = Timesheet.GetDays().ToDictionary(key => key, element => Timesheet.SheetDailyHours(element));
+        DailyHours = Timesheet.GetDays().ToDictionary(key => key, Timesheet.SheetDailyHours);
     }
 }
 
