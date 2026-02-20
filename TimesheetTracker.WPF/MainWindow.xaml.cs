@@ -8,7 +8,14 @@ public partial class MainWindow : Window
 {
     public MainWindow()
     {
+        _ = Initialize();
+    }
+
+    async Task Initialize()
+    {
+        var viewModel = new MainWindowViewModel();
+        await viewModel.Initialize();
+        DataContext = viewModel;
         InitializeComponent();
-        DataContext = new MainWindowViewModel();
     }
 }
