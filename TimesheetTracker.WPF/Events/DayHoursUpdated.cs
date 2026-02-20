@@ -2,4 +2,4 @@
 
 namespace TimesheetTracker.WPF.Events;
 
-public record DayHoursChanged(Day Day);
+public record DayHoursUpdated(Day Day);

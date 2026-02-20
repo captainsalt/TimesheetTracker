@@ -20,7 +20,7 @@ public partial class DayModel(Day day) : ObservableObject
         if (value == current) return;
 
         Day.WorkHours += value - current;
-        _ = WeakReferenceMessenger.Default.Send(new DayHoursChanged(Day));
+        _ = WeakReferenceMessenger.Default.Send(new DayHoursUpdated(Day));
     }
 
     public void Refresh()

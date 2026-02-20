@@ -11,7 +11,7 @@ using TimesheetTracker.WPF.Models;
 
 namespace TimesheetTracker.WPF;
 
-public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHoursChanged>
+public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHoursUpdated>
 {
     [GeneratedRegex(@"timesheet_(?<year>\d+)_(?<month>\d+)\.json$")]
     private static partial Regex TimesheetRegex();
@@ -96,7 +96,7 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
         ProjectViewModels = new(value.Projects.Select(p => new ProjectModel(p, Timesheet.DaysInMonth)));
     }
 
-    public void Receive(DayHoursChanged message)
+    public void Receive(DayHoursUpdated message)
     {
         DailyHours = Timesheet.GetDays().ToDictionary(key => key, Timesheet.SheetDailyHours);
     }

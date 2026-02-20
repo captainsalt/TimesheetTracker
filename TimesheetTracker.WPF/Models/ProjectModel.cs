@@ -7,7 +7,7 @@ namespace TimesheetTracker.WPF.Models;
 
 public partial class ProjectModel :
     ObservableRecipient,
-    IRecipient<DayHoursChanged>,
+    IRecipient<DayHoursUpdated>,
     IRecipient<TimesheetFilled>
 {
     public Project Project { get; }
@@ -37,7 +37,7 @@ public partial class ProjectModel :
         OnPropertyChanged(nameof(WorkHoursLeft));
     }
 
-    public void Receive(DayHoursChanged message)
+    public void Receive(DayHoursUpdated message)
     {
         NotifyCalculations();
     }
