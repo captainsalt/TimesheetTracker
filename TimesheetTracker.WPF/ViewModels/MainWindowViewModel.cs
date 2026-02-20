@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,9 +12,6 @@ namespace TimesheetTracker.WPF;
 
 public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHoursUpdated>
 {
-    [GeneratedRegex(@"timesheet_(?<year>\d+)_(?<month>\d+)\.json$")]
-    private static partial Regex TimesheetRegex();
-
     public MainWindowViewModel()
     {
         _ = Initialize();
@@ -23,7 +19,14 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
 
     public async Task Initialize()
     {
-        await LoadTimesheet(DateTime.Now.Year, DateTime.Now.Month);
+        (_, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(DateTime.Now.Year, DateTime.Now.Month);
+
+        if (timesheet is null)
+        {
+            _ = MessageBox.Show("Could not load timesheet for current month, creating new timesheet", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        Timesheet = timesheet ?? new Timesheet(DateTime.Now.Year, DateTime.Now.Month);
         DailyHours = Timesheet.GetDays().ToDictionary(key => key, Timesheet.SheetDailyHours);
         IsActive = true;
     }
@@ -66,15 +69,7 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
             return;
         }
 
-        GroupCollection matchCollection = TimesheetRegex().Match(openFileDialog.FileName).Groups;
-        int year = int.Parse(matchCollection["year"].Value);
-        int month = int.Parse(matchCollection["month"].Value);
-        await LoadTimesheet(year, month);
-    }
-
-    private async Task LoadTimesheet(int year, int month)
-    {
-        (_, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(year, month);
+        (_, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(openFileDialog.FileName);
 
         if (timesheet is null)
         {
