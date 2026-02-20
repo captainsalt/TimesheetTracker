@@ -11,7 +11,7 @@ public partial class MainWindow : Window
         _ = Initialize();
     }
 
-    async Task Initialize()
+    private async Task Initialize()
     {
         var viewModel = new MainWindowViewModel();
         await viewModel.Initialize();
