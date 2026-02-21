@@ -54,8 +54,14 @@ public static class AppConfiguration
     public static async Task<(Exception? exception, Timesheet? timesheet)> LoadTimesheet(string fileName)
     {
         GroupCollection matchCollection = TimesheetRegex.Match(fileName).Groups;
-        int year = int.Parse(matchCollection["year"].Value);
-        int month = int.Parse(matchCollection["month"].Value);
+        bool yearMatched = int.TryParse(matchCollection["year"].Value, out var year);
+        bool monthMatched = int.TryParse(matchCollection["month"].Value, out var month);
+
+        if (!yearMatched || !monthMatched)
+        {
+            return (new FormatException("File name does not match expected format"), ConfigTemplate());
+        }
+
         return await LoadTimesheet(year, month);
     }
 

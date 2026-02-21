@@ -69,15 +69,19 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
             return;
         }
 
-        (_, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(openFileDialog.FileName);
+        (Exception? exception, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(openFileDialog.FileName);
 
-        if (timesheet is null)
+        if (exception is { } ex)
         {
-            _ = MessageBox.Show("Could not load configuration timesheet", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            _ = MessageBox.Show($"Could not load configuration timesheet: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
-        Timesheet = timesheet;
+        Timesheet = timesheet switch
+        {
+            null => Timesheet,
+            _ => timesheet
+        };
     }
 
     [RelayCommand]
