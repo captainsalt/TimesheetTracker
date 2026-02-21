@@ -26,6 +26,11 @@ public static class AppConfiguration
         return timesheet;
     }
 
+    private static string TimesheetFileName(int year, int month)
+    {
+        return $"timesheet_{year}_{month}.json";
+    }
+
     public static void OpenTimesheetDirectory()
     {
         using var _ = Process.Start("explorer.exe", TimesheetDirectory.FullName);
@@ -42,7 +47,7 @@ public static class AppConfiguration
             TimesheetDirectory.Create();
 
         string timesheetJson = TimesheetToJson(timesheet);
-        FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, $"timesheet_{timesheet.Year}_{timesheet.Month}.json"));
+        FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, TimesheetFileName(timesheet.Year, timesheet.Month)));
         await File.WriteAllTextAsync(timesheetConfig.FullName, timesheetJson);
     }
 
@@ -56,7 +61,7 @@ public static class AppConfiguration
 
     public static async Task<(Exception? exception, Timesheet? timesheet)> LoadTimesheet(int year, int month)
     {
-        FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, $"timesheet_{year}_{month}.json"));
+        FileInfo timesheetConfig = new(Path.Combine(TimesheetDirectory.FullName, TimesheetFileName(year, month)));
 
         try
         {
