@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -77,11 +78,7 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
             return;
         }
 
-        Timesheet = timesheet switch
-        {
-            null => Timesheet,
-            _ => timesheet
-        };
+        Timesheet = timesheet ?? Timesheet;
     }
 
     [RelayCommand]
