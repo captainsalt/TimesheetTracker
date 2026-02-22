@@ -71,9 +71,9 @@ public partial class MainWindowViewModel : ObservableRecipient, IRecipient<DayHo
 
         (Exception? exception, Timesheet? timesheet) = await AppConfiguration.LoadTimesheet(openFileDialog.FileName);
 
-        if (exception is { } ex)
+        if (exception is not null)
         {
-            _ = MessageBox.Show($"Could not load configuration timesheet: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            _ = MessageBox.Show($"Could not load configuration timesheet: {exception.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
