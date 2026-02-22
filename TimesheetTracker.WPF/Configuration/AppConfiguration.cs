@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Microsoft.Win32;
 using TimesheetTracker.Core;
 
 namespace TimesheetTracker.WPF.Configuration;
@@ -54,15 +53,12 @@ public static class AppConfiguration
     public static async Task<(Exception? exception, Timesheet? timesheet)> LoadTimesheet(string fileName)
     {
         GroupCollection matchCollection = TimesheetRegex.Match(fileName).Groups;
-        bool yearMatched = int.TryParse(matchCollection["year"].Value, out var year);
-        bool monthMatched = int.TryParse(matchCollection["month"].Value, out var month);
+        bool yearMatched = int.TryParse(matchCollection["year"].Value, out int year);
+        bool monthMatched = int.TryParse(matchCollection["month"].Value, out int month);
 
-        if (!yearMatched || !monthMatched)
-        {
-            return (new FormatException("File name does not match expected format"), ConfigTemplate());
-        }
-
-        return await LoadTimesheet(year, month);
+        return yearMatched && monthMatched
+            ? await LoadTimesheet(year, month)
+            : (new FormatException("File name does not match expected format"), ConfigTemplate());
     }
 
     public static async Task<(Exception? exception, Timesheet? timesheet)> LoadTimesheet(int year, int month)
